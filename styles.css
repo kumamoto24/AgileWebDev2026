@@ -1,0 +1,176 @@
+/* Colors */
+:root {
+  --primary-color: #e63978;     /* main brand color */
+  --secondary-color: #6c63ff;   /* secondary accent */
+  --background-color: #fff5f8;
+  --text-color: #333;
+  --white: #ffffff;
+}
+
+.hero-section {
+  height: 100vh;
+      background-image: url("https://henrydelacweddings.com/wp-content/uploads/2022/01/japan-cherry-blossom-engagement-photo-henry-delac-weddings-10.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex; /* Enable Centering*/
+      align-items: center; /*Vertical Centered*/
+      justify-content: center; /*Horizontal Centered*/
+      color: white;
+      text-align: center;
+    }
+
+/* Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+}
+
+/* Navbar*/
+
+/* Main navbar container */
+.navbar-custom {
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);                          /* controls height */
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+}
+
+/* Brand */
+.navbar-custom .navbar-brand {
+  color: #1A1A1A;
+  font-size: 3rem;                        /* change logo size */
+  font-weight: bold;
+  
+  
+  font-family:fantasy;
+}
+
+/* Navigation links */
+.navbar-custom .nav-link {
+  color: #555555;
+  font-size: 1.4rem;                          /* change text size */
+  margin-left: 15px;                        /* spacing between links */
+}
+
+/* Hover effect */
+.navbar-custom .nav-link:hover {
+  color: #ffd6e0;
+}
+
+
+/* Navbar button */
+.navbar-custom .btn {
+  border-radius: 25px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+}
+
+/* Login buttton */
+.btn-login {
+  background-color: #E94E77;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+  font-size:1.5rem;
+
+}
+
+.btn-login:hover {
+  background-color: #d63c65;
+  color: white;
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: var(--primary-color);
+  font-weight: 700;
+  
+}
+
+h5 {
+  font-weight: bold;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Button styles */
+
+/* Primary button */
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.5rem;
+  
+}
+
+.btn-primary-custom:hover {
+  background-color: #d62868;
+}
+
+/* Secondary button */
+.btn-secondary-custom {
+  background-color: var(--secondary-color);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size:1.5rem;
+  margin: 20px 15px;
+}
+
+.btn-secondary-custom:hover {
+  background-color: #5a54d1;
+}
+
+/* Outline button */
+.btn-outline-custom {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  padding: 10px 20px;
+  border-radius: 30px;
+}
+
+.btn-outline-custom:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+/* Card */
+
+.card-custom {
+  background-color: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.profilecard-custom {
+  background-color: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Profile image */
+.uniform-img {
+  width: 250px;
+  height: 250px;       /* fixed height */
+  object-fit: cover;   /* crop instead of stretch */
+}
