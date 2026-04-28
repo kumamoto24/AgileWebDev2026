@@ -1,0 +1,213 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ff758c, #ff7eb3);
+  overflow: hidden;
+}
+
+/* Floating blob */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: float 8s infinite ease-in-out;
+}
+
+.blob1 {
+  width: 200px;
+  height: 200px;
+  background: #fff;
+  top: 10%;
+  left: 20%;
+}
+
+.blob2 {
+  width: 300px;
+  height: 300px;
+  background: #ffd1dc;
+  bottom: 10%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+}
+
+
+.login-container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  /* width: 320px; */
+  max-width: 400px;
+  width: 90%; 
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+
+  /*When refreshing the page*/
+  animation: fadeInUp 0.8s ease;
+  position:relative;
+  z-index: 2;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* dynamic logo animation */
+.logo {
+  font-size: 26px;
+  color: #ff4d6d;
+  margin-bottom: 10px;
+  animation: heartbeat 1.5s infinite;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+}
+
+h2 {
+  color: #ff4d6d;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+}
+
+/* label */
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 14px;
+  pointer-events: none;
+  transition: 0.4s ease;
+  background: transparent;
+  padding: 0 5px;
+}
+
+/* The animation that will occur when user type */
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: #ff4d6d;
+}
+
+/* focus glow on the form box when clicked */
+.input-group input:focus {
+  border-color: #ff4d6d;
+  box-shadow: 0 0 8px rgba(255, 77, 109, 0.3);
+}
+/* Button */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ff4d6d, #ff758c);
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Ripple effect  */
+.login-btn:active::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  top: 0;
+  left: 0;
+  border-radius: 10px;
+}
+
+.extra-links {
+  margin-top: 15px;
+  font-size: 13px;
+}
+
+.extra-links a {
+  color: #ff4d6d;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.extra-links a:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+/*For mobile user*/
+@media (max-width: 600px) {
+  .login-container {
+    width: 90%;
+    padding: 25px;
+    border-radius: 16px;
+  }
+
+  .login-container h2 {
+    font-size: 20px;
+  }
+
+  .logo {
+    font-size: 22px;
+  }
+
+  .input-group input {
+    font-size: 16px; /*  iOS zoom */
+  }
+}
