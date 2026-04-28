@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeartLink</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="logo.png">
+
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span id="closeLogin">&times;</span>
+
+      <h2 style="font-weight: 750;">Login</h2>
+
+      <form>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+
+      <!-- Sign Up Link -->
+      <p class="signup-text">
+        Don’t have an account yet?
+        <a href="signup.html">Sign Up</a>
+      </p>
+    </div>
+  </div>
+  
+
+  <main>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+      <div class="row g-4 align-items-start">
+
+        <!-- Left: Profile Picture -->
+        <div class="col-md-4 profile-picture-area">
+          <label for="profilePicInput">
+            <img 
+              src="user_profile.png" 
+              alt="Profile picture" 
+              class="myprofile-img"
+              style="border-radius: 360px"
+            >
+
+          </label>
+
+          <button 
+            id="editProfileImageBtn" 
+            class="btn btn-primary mt-3"
+            onclick="document.getElementById('profilePicInput').click();"
+          >
+            Change Profile Picture
+          </button>
+          
+          <input 
+            type="file" 
+            id="profilePicInput" 
+            name="profilePicture" 
+            accept="image/*"
+            style="display:none"
+          >
+        
+        
+
+        </div>
+
+        <!-- Display Section -->
+        <div id="profileDisplay" class="col-md-8 basic-info">
+          <h1 id="displayName">Jane Doe</h1>
+
+          <p>
+            <strong>Age:</strong>
+            <span id="displayAge">24</span>
+          </p>
+
+          <p>
+            <strong>Location:</strong>
+            <span id="displayLocation">Tokyo, Japan</span>
+          </p>
+
+          <p>
+            <strong>Interests:</strong>
+            <span id="displayInterests">Music, Movies, Fitness, Cooking</span>
+          </p>
+
+          <p>
+            <strong>Bio:</strong>
+            <span id="displayBio">
+              I love coffee, music, traveling, and meeting new people.
+            </span>
+          </p>
+
+          <!-- Edit Button -->
+          <button id="editProfileBtn" class="btn btn-primary mb-3">
+            Edit Profile
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Hidden Form(Profile)-->
+      <div id="profileModal" class="modal">
+        <form id="profileForm" class="profile-popup">
+          <span id="closeProfile" class="close">&times;</span>
+
+          <h1>Edit Profile</h1>
+
+          <label>Name:</label>
+          <input type="text" id="nameInput" value="Alex Johnson">
+
+          <label>Age:</label>
+          <input type="number" id="ageInput" value="24">
+
+          <label>Location:</label>
+          <input type="text" id="locationInput" value="Tokyo, Japan">
+
+          <label>Interests:</label>
+          <input type="text" id="interestsInput" value="Music, Movies, Fitness, Cooking">
+
+          <label>Bio:</label>
+          <textarea id="bioInput">I love coffee, music, traveling, and meeting new people.</textarea>
+
+          <button type="submit" class="btn btn-success">Save</button>
+        </form>
+      </div>
+
+    </section>
+
+    <section class="story-section container mt-5">
+      <h1 class="text-center">My Story</h1>
+      <p class="text-center text-muted mb-4" style="font-weight: bold;">
+        Choose your best 3 shots!
+      </p>
+
+      <div class="row justify-content-center g-4">
+
+        <!-- Card 1 -->
+        <div class="col-md-4">
+          <div class="card h-100 story-card" role="button">
+            <img src="beach.jpg" class="card-img-top story-img" alt="Story 1">
+            <div class="card-body text-center">
+              <h5 class="card-title story-title">Beach Day</h5>
+              <p class="card-text story-description">
+                (Example) A day at the beach.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-md-4">
+          <div class="card h-100 story-card" role="button">
+            <img src="coffee.jpg" class="card-img-top story-img" alt="Story 2">
+            <div class="card-body text-center">
+              <h5 class="card-title story-title">Coffee Date</h5>
+              <p class="card-text story-description">
+                (Example) Coffee date vibes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-md-4">
+          <div class="card h-100 story-card" role="button">
+            <img src="operahouse.jpg" class="card-img-top story-img" alt="Story 3">
+            <div class="card-body text-center">
+              <h5 class="card-title story-title">Operahouse</h5>
+              <p class="card-text story-description">
+                (Example) Operahouse sightseeing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+
+        <div id="storyModal" class="modal">
+          <form id="storyForm" class="profile-popup">
+            <span id="closeStory" class="close">&times;</span>
+
+            <h1>Edit Story</h1>
+
+            <label>Story picture:</label>
+            <input type="file" id="storyPicInput" accept="image/*">
+
+            <label>Title:</label>
+            <input type="text" id="storyTitleInput">
+
+            <label>Description:</label>
+            <textarea id="storyDescriptionInput"></textarea>
+
+            <button type="submit" class="btn btn-success">Save</button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="index.js"></script>
+  <script src="profileform.js"></script>
+  <script src="profileimage.js"></script>
+  <script src="storyModal.js"></script>
+
+</body>
