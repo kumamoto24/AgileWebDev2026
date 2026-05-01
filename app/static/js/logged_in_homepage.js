@@ -38,6 +38,7 @@ async function searchProfiles() {
     }
 }
 
+// TODO: Add pagination later to limit the number of profiles shown per page.
 function displayProfiles(profiles) {
     const profileList = document.getElementById("profileList");
     profileList.innerHTML = "";
