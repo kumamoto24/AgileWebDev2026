@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parallax Demo</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      height: 100vh;
+      background-image: url("https://picsum.photos/1600/900");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed; /* KEY LINE */
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+    }
+
+    /* CONTENT SECTION */
+    .content {
+      height: 100vh;
+      padding: 50px;
+      background: #f4f4f4;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <h1>Find Your Perfect Match</h1>
+      <p>Scroll down to see the effect</p>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="content">
+    <h2>More Content</h2>
+    <p>This section scrolls, but the background above stays fixed.</p>
+  </section>
+
+</body>
+</html>

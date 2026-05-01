@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}HeartLink - Home{% endblock %}
+
+{% block content %}
+
+  <!-- Hero Section -->
+  <section class="hero-section text-center py-5">
+    <div class="container">
+      <h1 
+        class="section-title" 
+        style="font-size: clamp(2.8rem, 5vw, 12rem); text-shadow: 2px 2px 8px rgba(0,0,0,0.6);"
+      >
+        Find Your Perfect Match
+      </h1>
+
+      <p style="font-size: clamp(1rem, 5vw, 1.8rem); text-shadow: 2px 2px 8px rgba(0,0,0,0.6);">
+        Connect with people who share your interests and values.
+      </p>
+
+      <button class="btn-primary-custom mt-3">Get Started</button>
+    </div>
+  </section>
+
+  <!-- Feature Cards -->
+  <section class="py-5">
+    <div class="container">
+      <h2 class="section-title">Why Choose Us?</h2>
+
+      <div class="row g-4">
+
+        <div class="col-md-4">
+          <div class="card-custom text-center">
+            <h4>Smart Matching</h4>
+            <p>We match you based on personality and interests.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card-custom text-center">
+            <h4>Secure Chat</h4>
+            <p>Talk safely with people you like.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card-custom text-center">
+            <h4>Real Connections</h4>
+            <p>Build meaningful relationships.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Profile Cards -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="section-title">Featured Profiles</h2>
+
+      <div class="row g-4">
+        <!-- Put your profile cards here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="text-center py-5">
+    <div class="container">
+      <h2 
+        class="section-title" 
+        style="font-size: clamp(1.2rem, 5vw, 4rem);"
+      >
+        Start Your Journey Today
+      </h2>
+
+      <p style="font-size: clamp(0.8rem, 5vw, 1.8rem);">
+        Join now and meet amazing people.
+      </p>
+
+      <button class="btn-secondary-custom">Create Account</button>
+    </div>
+  </section>
+
+{% endblock %}

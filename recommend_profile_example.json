@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name": "Emily",
+  "age": 22,
+  "location": "Perth",
+  "distance": 5.2,
+  "interests": ["Music", "Travel"],
+  "image": "/static/images/emily.jpg"
+}
