@@ -174,3 +174,131 @@ h5 {
   height: 250px;       /* fixed height */
   object-fit: cover;   /* crop instead of stretch */
 }
+
+/* Following is login card inside index page AND sign up page */
+/*Hiddedn login nav bar*/
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  width: 400px;
+  max-width: 90%;
+  padding: 30px;
+  border-radius: 15px;
+  margin: 10% auto;
+  position: relative;
+}
+
+#loginModal .modal-content h2 {
+  margin-bottom: 24px;
+}
+
+
+
+#closeLogin {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+}
+
+/* label */
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 14px;
+  pointer-events: none;
+  transition: 0.4s ease;
+  background: transparent;
+  padding: 0 5px;
+}
+
+/* The animation that will occur when user type */
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: #ff4d6d;
+}
+
+/* focus glow on the form box when clicked */
+.input-group input:focus {
+  border-color: #ff4d6d;
+  box-shadow: 0 0 8px rgba(255, 77, 109, 0.3);
+}
+/* Button */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ff4d6d, #ff758c);
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Ripple effect  */
+.login-btn:active::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  top: 0;
+  left: 0;
+  border-radius: 10px;
+}
+
+.extra-links {
+  margin-top: 15px;
+  font-size: 13px;
+}
+
+.extra-links a {
+  color: #ff4d6d;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.extra-links a:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
