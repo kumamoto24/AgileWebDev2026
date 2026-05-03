@@ -1,7 +1,7 @@
 /* Colors */
 :root {
-  --primary-color: #e63978;     /* main brand color */
-  --secondary-color: #6c63ff;   /* secondary accent */
+  --primary-color: #e63978; /* main brand color */
+  --secondary-color: #6c63ff; /* secondary accent */
   --background-color: #fff5f8;
   --text-color: #333;
   --white: #ffffff;
@@ -9,16 +9,16 @@
 
 .hero-section {
   height: 100vh;
-      background-image: url("https://henrydelacweddings.com/wp-content/uploads/2022/01/japan-cherry-blossom-engagement-photo-henry-delac-weddings-10.jpg");
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      display: flex; /* Enable Centering*/
-      align-items: center; /*Vertical Centered*/
-      justify-content: center; /*Horizontal Centered*/
-      color: white;
-      text-align: center;
-    }
+  background-image: url("https://henrydelacweddings.com/wp-content/uploads/2022/01/japan-cherry-blossom-engagement-photo-henry-delac-weddings-10.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex; /* Enable Centering*/
+  align-items: center; /*Vertical Centered*/
+  justify-content: center; /*Horizontal Centered*/
+  color: white;
+  text-align: center;
+}
 
 /* Styles */
 body {
@@ -33,7 +33,7 @@ body {
 /* Main navbar container */
 .navbar-custom {
   background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);                          /* controls height */
+  backdrop-filter: blur(10px); /* controls height */
   min-height: 70px;
   display: flex;
   align-items: center;
@@ -41,26 +41,24 @@ body {
 
 /* Brand */
 .navbar-custom .navbar-brand {
-  color: #1A1A1A;
-  font-size: 3rem;                        /* change logo size */
+  color: #1a1a1a;
+  font-size: 3rem; /* change logo size */
   font-weight: bold;
-  
-  
-  font-family:fantasy;
+
+  font-family: fantasy;
 }
 
 /* Navigation links */
 .navbar-custom .nav-link {
   color: #555555;
-  font-size: 1.4rem;                          /* change text size */
-  margin-left: 15px;                        /* spacing between links */
+  font-size: 1.4rem; /* change text size */
+  margin-left: 15px; /* spacing between links */
 }
 
 /* Hover effect */
 .navbar-custom .nav-link:hover {
   color: #ffd6e0;
 }
-
 
 /* Navbar button */
 .navbar-custom .btn {
@@ -71,15 +69,14 @@ body {
 
 /* Login buttton */
 .btn-login {
-  background-color: #E94E77;
+  background-color: #e94e77;
   color: white;
   padding: 6px 16px;
   border-radius: 100px;
   text-decoration: none;
   font-weight: 500;
   transition: 0.3s;
-  font-size:1.5rem;
-
+  font-size: 1.5rem;
 }
 
 .btn-login:hover {
@@ -88,10 +85,11 @@ body {
 }
 
 /* Headings */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: var(--primary-color);
   font-weight: 700;
-  
 }
 
 h5 {
@@ -115,7 +113,6 @@ h5 {
   cursor: pointer;
   font-weight: 600;
   font-size: 1.5rem;
-  
 }
 
 .btn-primary-custom:hover {
@@ -131,7 +128,7 @@ h5 {
   border-radius: 30px;
   cursor: pointer;
   font-weight: 600;
-  font-size:1.5rem;
+  font-size: 1.5rem;
   margin: 20px 15px;
   text-decoration: none;
 }
@@ -172,11 +169,12 @@ h5 {
 /* Profile image */
 .uniform-img {
   width: 250px;
-  height: 250px;       /* fixed height */
-  object-fit: cover;   /* crop instead of stretch */
+  height: 250px; /* fixed height */
+  object-fit: cover; /* crop instead of stretch */
 }
 
-/* Following is login card inside index page AND sign up page */
+/* Following is for the login and sign-up features */
+
 /*Hiddedn login nav bar*/
 
 .modal {
