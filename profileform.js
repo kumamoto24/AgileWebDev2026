@@ -29,3 +29,25 @@ profileForm.onsubmit = (e) => {
 
   profileModal.style.display = "none";
 };
+
+
+
+
+function initAutocomplete() {
+  const input = document.getElementById("locationInput");
+
+  const autocomplete = new google.maps.places.Autocomplete(input, {
+    types: ["(cities)"],
+    fields: ["place_id", "name", "formatted_address"]
+  });
+
+  autocomplete.addListener("place_changed", () => {
+    const place = autocomplete.getPlace();
+
+    document.getElementById("locationInput").value =
+      place.formatted_address || place.name;
+
+    document.getElementById("locationPlaceId").value =
+      place.place_id;
+  });
+}

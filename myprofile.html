@@ -85,7 +85,7 @@
 
           <p>
             <strong>Location:</strong>
-            <span id="displayLocation">Tokyo, Japan</span>
+            <span id="displayInterests">Perth, Australia</span>
           </p>
 
           <p>
@@ -122,7 +122,8 @@
           <input type="number" id="ageInput" value="24">
 
           <label>Location:</label>
-          <input type="text" id="locationInput" value="Tokyo, Japan">
+            <input id="locationInput" type="text" placeholder="Enter your city">
+            <input id="locationPlaceId" type="hidden">
 
           <label>Interests:</label>
           <input type="text" id="interestsInput" value="Music, Movies, Fitness, Cooking">
@@ -212,5 +213,9 @@
   <script src="profileform.js"></script>
   <script src="profileimage.js"></script>
   <script src="storyModal.js"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete"
+    async defer>
+  </script>
 
 </body>
