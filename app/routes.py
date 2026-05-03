@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, request, redirect, url_for
+from flask import render_template, jsonify, request
 from app import app
 import os
 
@@ -109,11 +109,7 @@ def search_profiles():
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
-    return render_template(
-        "myprofile.html",
-        google_maps_api_key=os.environ.get("GOOGLE_MAPS_API_KEY", ""),
-        is_logged_in=True
-    )
+    return "Profile page placeholder"
 
 
 @app.route("/profile/<int:profile_id>")
