@@ -55,22 +55,7 @@ def logout():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "").strip()
-
-        if not username or not email or not password:
-            return render_template(
-                "signup.html",
-                is_logged_in=False,
-                signup_error="Please complete all required fields."
-            )
-
-        # Placeholder flow until database/user authentication is implemented.
-        return redirect(url_for("home"))
-
-    return render_template("signup.html", is_logged_in=False)
+    return "Signup page placeholder"
 
 @app.route("/api/recommended-profiles")
 def recommended_profiles():
@@ -129,27 +114,4 @@ def messages():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Use the login form/modal inside index.html instead of a separate login page."""
-    if request.method == "POST":
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "")
-
-        # Temporary demo login logic.
-        # Replace this with real database authentication later.
-        if email and password:
-            return redirect(url_for("home"))
-
-        return render_template(
-            "index.html",
-            is_logged_in=False,
-            profiles=sample_profiles,
-            show_login_modal=True,
-            login_error="Please enter both email and password."
-        )
-
-    return render_template(
-        "index.html",
-        is_logged_in=False,
-        profiles=sample_profiles,
-        show_login_modal=True
-    )
+    return "Login page placeholder"
