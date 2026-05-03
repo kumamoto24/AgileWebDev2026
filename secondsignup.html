@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign up</title>
+
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+
+    <style>
+      :root {
+        --primary-color: #e63978;
+        --secondary-color: #6c63ff;
+        --background-color: #fff5f8;
+        --text-color: #333;
+        --white: #ffffff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        background-color: var(--background-color);
+      }
+
+      h2{
+        font-size: 2.5rem;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 36px;
+        text-decoration: none;
+        z-index: 10;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 50%;
+        padding: 8px;
+      }
+
+      .back-button:hover {
+        color: var(--primary-color);
+      }
+
+      /* Main layout */
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+
+      /* Left image */
+      .image-section {
+        flex: 2;
+      }
+
+      .image-section img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .image-section {
+        flex: 2;
+        position: relative; /* IMPORTANT */
+      }
+
+      .image-phrase {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 550;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+      }
+
+      /* 📱 Mobile tweak */
+      @media (max-width: 768px) {
+        .image-phrase {
+          font-size: 1rem;
+          bottom: 10px;
+        }
+      }
+
+      /* Right form */
+      .form-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 40px;
+        background-color: var(--white);
+      }
+
+      .form-section h2 {
+        margin-bottom: 10px;
+        color: var(--primary-color);
+        font-weight: 700;
+      }
+
+      .catchphrase {
+        margin-bottom: 20px;
+        color: var(--text-color);
+        font-size: 1.2rem;
+        font-style: italic;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      form input {
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+
+      form button {
+        padding: 12px;
+        border: none;
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.5rem;
+        transition: background-color 0.3s;
+      }
+
+      form button:hover {
+        background-color: #d62868;
+      }
+
+      /* 📱 Mobile responsiveness */
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+
+        .image-section {
+          height: 40%;
+        }
+
+        .form-section {
+          height: 60%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="index.html" class="back-button"
+      ><i class="bi bi-arrow-left"></i
+    ></a>
+    <div class="container">
+      <!-- Left Image -->
+      <div class="image-section">
+        <img src="cherry-blossom.jpg" alt="Romantic Cherry Blossom" />
+        <div class="image-phrase">
+          “Love blooms where you least expect it 🌸”
+        </div>
+      </div>
+
+      <!-- Right Form -->
+      <div class="form-section">
+        <h2>Find Your Soulmate</h2>
+        <p class="catchphrase">
+          Love is just a click away. Join our community of dreamers and find
+          your perfect match today!
+        </p>
+
+        <form>
+          <div class="input-group">
+            <input type="text" placeholder=" " required />
+            <label for="text">Username</label>
+          </div>
+
+          <div class="input-group">
+            <input type="email" id="Email" placeholder=" " required />
+            <label for="email">Email</label>
+          </div>
+
+          <div class="input-group">
+            <input type="password" id="Password" placeholder=" " required />
+            <label for="password">Password</label>
+          </div>
+
+          <button class="login-btn" type="submit">Start Your Love Story</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
