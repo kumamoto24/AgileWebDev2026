@@ -1,7 +1,7 @@
 /* Colors */
 :root {
-  --primary-color: #e63978;     /* main brand color */
-  --secondary-color: #6c63ff;   /* secondary accent */
+  --primary-color: #e63978; /* main brand color */
+  --secondary-color: #6c63ff; /* secondary accent */
   --background-color: #fff5f8;
   --text-color: #333;
   --white: #ffffff;
@@ -9,16 +9,16 @@
 
 .hero-section {
   height: 100vh;
-      background-image: url("https://henrydelacweddings.com/wp-content/uploads/2022/01/japan-cherry-blossom-engagement-photo-henry-delac-weddings-10.jpg");
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      display: flex; /* Enable Centering*/
-      align-items: center; /*Vertical Centered*/
-      justify-content: center; /*Horizontal Centered*/
-      color: white;
-      text-align: center;
-    }
+  background-image: url("https://henrydelacweddings.com/wp-content/uploads/2022/01/japan-cherry-blossom-engagement-photo-henry-delac-weddings-10.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex; /* Enable Centering*/
+  align-items: center; /*Vertical Centered*/
+  justify-content: center; /*Horizontal Centered*/
+  color: white;
+  text-align: center;
+}
 
 /* Styles */
 body {
@@ -33,7 +33,7 @@ body {
 /* Main navbar container */
 .navbar-custom {
   background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);                          /* controls height */
+  backdrop-filter: blur(10px); /* controls height */
   min-height: 70px;
   display: flex;
   align-items: center;
@@ -41,26 +41,24 @@ body {
 
 /* Brand */
 .navbar-custom .navbar-brand {
-  color: #1A1A1A;
-  font-size: 3rem;                        /* change logo size */
+  color: #1a1a1a;
+  font-size: 3rem; /* change logo size */
   font-weight: bold;
-  
-  
-  font-family:fantasy;
+
+  font-family: fantasy;
 }
 
 /* Navigation links */
 .navbar-custom .nav-link {
   color: #555555;
-  font-size: 1.4rem;                          /* change text size */
-  margin-left: 15px;                        /* spacing between links */
+  font-size: 1.4rem; /* change text size */
+  margin-left: 15px; /* spacing between links */
 }
 
 /* Hover effect */
 .navbar-custom .nav-link:hover {
   color: #ffd6e0;
 }
-
 
 /* Navbar button */
 .navbar-custom .btn {
@@ -71,15 +69,14 @@ body {
 
 /* Login buttton */
 .btn-login {
-  background-color: #E94E77;
+  background-color: #e94e77;
   color: white;
   padding: 6px 16px;
   border-radius: 100px;
   text-decoration: none;
   font-weight: 500;
   transition: 0.3s;
-  font-size:1.5rem;
-
+  font-size: 1.5rem;
 }
 
 .btn-login:hover {
@@ -88,10 +85,11 @@ body {
 }
 
 /* Headings */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: var(--primary-color);
   font-weight: 700;
-  
 }
 
 h5 {
@@ -115,7 +113,6 @@ h5 {
   cursor: pointer;
   font-weight: 600;
   font-size: 1.5rem;
-  
 }
 
 .btn-primary-custom:hover {
@@ -131,7 +128,7 @@ h5 {
   border-radius: 30px;
   cursor: pointer;
   font-weight: 600;
-  font-size:1.5rem;
+  font-size: 1.5rem;
   margin: 20px 15px;
 }
 
@@ -171,6 +168,135 @@ h5 {
 /* Profile image */
 .uniform-img {
   width: 250px;
-  height: 250px;       /* fixed height */
-  object-fit: cover;   /* crop instead of stretch */
+  height: 250px; /* fixed height */
+  object-fit: cover; /* crop instead of stretch */
+}
+
+/* Following is for the login and sign-up features */
+
+/*Hiddedn login nav bar*/
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  width: 400px;
+  max-width: 90%;
+  padding: 30px;
+  border-radius: 15px;
+  margin: 10% auto;
+  position: relative;
+}
+
+#loginModal .modal-content h2 {
+  margin-bottom: 24px;
+}
+
+
+
+#closeLogin {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+}
+
+/* label */
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 14px;
+  pointer-events: none;
+  transition: 0.4s ease;
+  background: transparent;
+  padding: 0 5px;
+}
+
+/* The animation that will occur when user type */
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: #ff4d6d;
+}
+
+/* focus glow on the form box when clicked */
+.input-group input:focus {
+  border-color: #ff4d6d;
+  box-shadow: 0 0 8px rgba(255, 77, 109, 0.3);
+}
+/* Button */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ff4d6d, #ff758c);
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Ripple effect  */
+.login-btn:active::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  top: 0;
+  left: 0;
+  border-radius: 10px;
+}
+
+.extra-links {
+  margin-top: 15px;
+  font-size: 13px;
+}
+
+.extra-links a {
+  color: #ff4d6d;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.extra-links a:hover {
+  text-decoration: underline;
+  opacity: 0.8;
 }

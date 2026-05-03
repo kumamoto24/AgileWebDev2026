@@ -4,6 +4,37 @@
 
 {% block content %}
 
+  {% if not is_logged_in %}
+  <!-- Login/Signup form-->
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span id="closeLogin">&times;</span>
+
+        <h2 style="font-weight: 750">Login</h2>
+
+        <form action="{{ url_for('login') }}" method="post">
+          <div class="input-group">
+            <input type="email" id="email" placeholder=" " required />
+            <label for="email">Email</label>
+          </div>
+
+          <div class="input-group">
+            <input type="password" id="password" placeholder=" " required />
+            <label for="password">Password</label>
+          </div>
+
+          <button class="login-btn">Login</button>
+        </form>
+
+        <!-- Sign Up Link -->
+        <div class="extra-links">
+          <p><a href="#">Forgot password?</a></p>
+          <p>Don't have an account? <a href="{{url_for('signup')}}">Sign up</a></p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
   <!-- Hero Section -->
   <section class="hero-section text-center py-5">
     <div class="container">
@@ -121,4 +152,8 @@
     </div>
   </section>
 
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
