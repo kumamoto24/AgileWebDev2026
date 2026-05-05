@@ -113,4 +113,15 @@
     </div>
   </section>
 </main>
+
+<div id="storyViewer" class="story-viewer-modal">
+  <div class="viewer-content">
+    <span id="closeViewer" class="close-btn">&times;</span>
+    <img id="viewerImg" src="" alt="Full view">
+    <h2 id="viewerTitle"></h2>
+    <p id="viewerDescription"></p>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/userprofile.js') }}"></script>
 {% endblock %}
