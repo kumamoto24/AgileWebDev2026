@@ -94,11 +94,20 @@
   border: none;
 }
 
-.story-card:hover,
+/* .story-card:hover,
 .story-card:focus {
   transform: translateY(-5px);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+} */
+.story-card:hover,
+.story-card:focus {
+  transform: translateY(-10px); /* Increased from -5px for a more noticeable move */
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2); /* Slightly deeper shadow than original */
+  cursor: pointer;
 }
+
+
+
 
 .story-img {
   width: 100%;
@@ -109,9 +118,83 @@
 
 .story-card .card-body {
   padding: 1.25rem;
+  height: 120px;                 /* Adjust this value to fit your title + clamped text */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .story-card .card-text {
   font-size: 16px;
   color: #555;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;         /* Change this to 3 if you want more text visible */
+  -webkit-box-orient: vertical;  
+  overflow: hidden;              /* Hides the extra text */
+  text-overflow: ellipsis;       /* Adds the "..." at the end */
+  min-height: 3rem;              /* Keeps the box the same size even if text is short */
+}
+
+
+/* For userprofile.html */
+
+/* Story Viewer Modal Styling */
+.story-viewer-modal {
+  display: none;
+  position: fixed;
+  z-index: 1100; 
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); 
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+
+.viewer-content {
+  background: white;
+  width: 600px;
+  max-width: calc(100% - 32px);
+  margin: 60px auto;
+  padding: 30px;
+  border-radius: 16px; 
+  position: relative;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.viewer-content img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.viewer-content h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.viewer-content p {
+  font-size: 18px;
+  color: #555;
+  line-height: 1.6;
+  word-wrap: break-word;       /* Breaks long words if necessary */
+  overflow-wrap: break-word;   /* Modern version of word-wrap */
+  white-space: normal;         /* Ensures text flows naturally */
+}
+
+/* Close button matching your .close class style */
+.close-viewer {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  border: 0;
+  background: transparent;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  color: #888;
 }
