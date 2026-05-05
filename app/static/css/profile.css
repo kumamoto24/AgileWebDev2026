@@ -118,11 +118,21 @@
 
 .story-card .card-body {
   padding: 1.25rem;
+  height: 120px;                 /* Adjust this value to fit your title + clamped text */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .story-card .card-text {
   font-size: 16px;
   color: #555;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;         /* Change this to 3 if you want more text visible */
+  -webkit-box-orient: vertical;  
+  overflow: hidden;              /* Hides the extra text */
+  text-overflow: ellipsis;       /* Adds the "..." at the end */
+  min-height: 3rem;              /* Keeps the box the same size even if text is short */
 }
 
 
@@ -171,6 +181,9 @@
   font-size: 18px;
   color: #555;
   line-height: 1.6;
+  word-wrap: break-word;       /* Breaks long words if necessary */
+  overflow-wrap: break-word;   /* Modern version of word-wrap */
+  white-space: normal;         /* Ensures text flows naturally */
 }
 
 /* Close button matching your .close class style */
