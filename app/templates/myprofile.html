@@ -191,9 +191,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-  <script src="{{ url_for('static', filename='js/profileform.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/profileimage.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/storyModal.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='js/myprofile.js') }}"></script>
   {% if google_maps_api_key %}
     <script
       src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete"
