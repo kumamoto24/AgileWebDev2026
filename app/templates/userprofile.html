@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}HeartLink - User Profile{% endblock %}
+
+{% block extra_head %}
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/profile.css') }}"
+  >
+{% endblock %}
+
+{% block content %}
+<main class="myprofile-page">
+  <section class="profile-section container">
+    <div class="row g-4 align-items-start">
+
+      <!-- Profile Picture -->
+      <div class="col-md-4 profile-picture-area">
+        <img
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=360&h=360&fit=crop"
+          alt="Profile picture"
+          class="myprofile-img"
+        >
+      </div>
+
+      <!-- Display Info -->
+      <div class="col-md-8 basic-info">
+        <h1>Jane Doe</h1>
+
+        <p>
+          <strong>Age:</strong>
+          <span>24</span>
+        </p>
+
+        <p>
+          <strong>Location:</strong>
+          <span>Perth, Australia</span>
+        </p>
+
+        <p>
+          <strong>Interests:</strong>
+          <span>Music, Movies, Fitness, Cooking</span>
+        </p>
+
+        <p>
+          <strong>Bio:</strong>
+          <span>
+            I love coffee, music, traveling, and meeting new people!
+          </span>
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Story Section -->
+  <section class="story-section container">
+    <h1 class="text-center">Their Story</h1>
+
+    <div class="row justify-content-center g-4">
+
+      <!-- Story 1 -->
+      <div class="col-md-4">
+        <div class="card h-100">
+          <img
+            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&h=420&fit=crop"
+            class="card-img-top story-img"
+            alt="Beach story"
+          >
+          <div class="card-body text-center">
+            <h5 class="card-title">Beach Day</h5>
+            <p class="card-text">
+              A day at the beach.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story 2 -->
+      <div class="col-md-4">
+        <div class="card h-100">
+          <img
+            src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=640&h=420&fit=crop"
+            class="card-img-top story-img"
+            alt="Coffee story"
+          >
+          <div class="card-body text-center">
+            <h5 class="card-title">Coffee Date</h5>
+            <p class="card-text">
+              Coffee date vibes.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story 3 -->
+      <div class="col-md-4">
+        <div class="card h-100">
+          <img
+            src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=640&h=420&fit=crop"
+            class="card-img-top story-img"
+            alt="Opera House story"
+          >
+          <div class="card-body text-center">
+            <h5 class="card-title">Opera House</h5>
+            <p class="card-text">
+              Opera House sightseeing.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+{% endblock %}

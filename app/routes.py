@@ -118,7 +118,10 @@ def profile():
 
 @app.route("/profile/<int:profile_id>")
 def profile_detail(profile_id):
-    return f"Profile detail page for user {profile_id}"
+    return render_template(
+        "userprofile.html",
+        profile_id=profile_id
+    )
 
 # '/matches' to be deleted
 @app.route("/matches")
