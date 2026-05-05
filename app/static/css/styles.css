@@ -202,8 +202,6 @@ h5 {
   margin-bottom: 24px;
 }
 
-
-
 #closeLogin {
   position: absolute;
   top: 10px;
@@ -219,12 +217,13 @@ h5 {
 
 .input-group input {
   width: 100%;
-  padding: 14px 10px;
+  height: 48px;
+  padding: 0 10px;
   border-radius: 10px;
   border: 1px solid #ddd;
-  outline: none;
   font-size: 16px;
   background: transparent;
+  outline: none;
 }
 
 /* label */
@@ -284,6 +283,17 @@ h5 {
   top: 0;
   left: 0;
   border-radius: 10px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.remember-me input[type="checkbox"] {
+  margin-right: 8px;
 }
 
 .extra-links {
