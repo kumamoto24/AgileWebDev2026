@@ -90,6 +90,8 @@ profilePicInput.addEventListener("change", function () {
 });
 
 
+
+
 // storymodal
 
 const storyModal = document.getElementById("storyModal");
@@ -132,6 +134,7 @@ storyModal.addEventListener("click", (event) => {
   }
 });
 
+
 storyForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -139,20 +142,33 @@ storyForm.addEventListener("submit", (event) => {
     return;
   }
 
+  const titleWords = storyTitleInput.value.trim().split(/\s+/).filter(Boolean).length;
+  const descWords = storyDescriptionInput.value.trim().split(/\s+/).filter(Boolean).length;
+
+  if (titleWords > 21) {
+    alert("Title must be 21 words or less.");
+    return; // Stops the execution
+  }
+
+  if (descWords > 1500) {
+    alert("Description must be 1500 words or less.");
+    return; // Stops the execution
+  }
+
   selectedStoryCard.querySelector(".story-title").textContent = storyTitleInput.value;
   selectedStoryCard.querySelector(".story-description").textContent = storyDescriptionInput.value;
 
   const file = storyPicInput.files[0];
-
   if (file) {
     const reader = new FileReader();
-
     reader.onload = function (loadEvent) {
       selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
     };
-
     reader.readAsDataURL(file);
   }
 
   storyModal.style.display = "none";
 });
+
+
+

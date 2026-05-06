@@ -1,159 +1,162 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}HeartLink - Home{% endblock %} {%
+block content %} {% if not is_logged_in %}
+<!-- Login/Signup form-->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span id="closeLogin">&times;</span>
 
-{% block title %}HeartLink - Home{% endblock %}
+    <h2 style="font-weight: 750">Login</h2>
 
-{% block content %}
+    <form action="{{ url_for('login') }}" method="post">
+      <div class="input-group">
+        <input type="email" id="email" placeholder=" " required />
+        <label for="email">Email</label>
+      </div>
 
-  {% if not is_logged_in %}
-  <!-- Login/Signup form-->
-    <div id="loginModal" class="modal">
-      <div class="modal-content">
-        <span id="closeLogin">&times;</span>
+      <div class="input-group">
+        <input type="password" id="password" placeholder=" " required />
+        <label for="password">Password</label>
+      </div>
 
-        <h2 style="font-weight: 750">Login</h2>
+      <div class="remember-me">
+        <input type="checkbox" id="remember" name="remember" />
+        <label for="remember">Remember me</label>
+      </div>
 
-        <form action="{{ url_for('login') }}" method="post">
-          <div class="input-group">
-            <input type="email" id="email" placeholder=" " required />
-            <label for="email">Email</label>
-          </div>
+      <button class="login-btn">Login</button>
+    </form>
 
-          <div class="input-group">
-            <input type="password" id="password" placeholder=" " required />
-            <label for="password">Password</label>
-          </div>
+    <!-- Sign Up Link -->
+    <div class="extra-links">
+      <p><a href="#">Forgot password?</a></p>
+      <p>Don't have an account? <a href="{{url_for('signup')}}">Sign up</a></p>
+    </div>
+  </div>
+</div>
+{% endif %}
 
-          <button class="login-btn">Login</button>
-        </form>
+<!-- Hero Section -->
+<section class="hero-section text-center py-5">
+  <div class="container">
+    <h1
+      class="section-title"
+      style="
+        font-size: clamp(2.8rem, 5vw, 12rem);
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+      "
+    >
+      Find Your Perfect Match
+    </h1>
 
-        <!-- Sign Up Link -->
-        <div class="extra-links">
-          <p><a href="#">Forgot password?</a></p>
-          <p>Don't have an account? <a href="{{url_for('signup')}}">Sign up</a></p>
+    <p
+      style="
+        font-size: clamp(1rem, 5vw, 1.8rem);
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+      "
+    >
+      Connect with people who share your interests and values.
+    </p>
+
+    <a
+      href="{{ url_for('signup') }}"
+      class="btn-primary-custom mt-3 text-decoration-none"
+    >
+      Get Started
+    </a>
+  </div>
+</section>
+
+<!-- Feature Cards -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="section-title">Why Choose Us?</h2>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-custom text-center">
+          <h4>Smart Matching</h4>
+          <p>We match you based on personality and interests.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom text-center">
+          <h4>Secure Chat</h4>
+          <p>Talk safely with people you like.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom text-center">
+          <h4>Real Connections</h4>
+          <p>Build meaningful relationships.</p>
         </div>
       </div>
     </div>
-    {% endif %}
-    
-  <!-- Hero Section -->
-  <section class="hero-section text-center py-5">
-    <div class="container">
-      <h1 
-        class="section-title" 
-        style="font-size: clamp(2.8rem, 5vw, 12rem); text-shadow: 2px 2px 8px rgba(0,0,0,0.6);"
-      >
-        Find Your Perfect Match
-      </h1>
+  </div>
+</section>
 
-      <p style="font-size: clamp(1rem, 5vw, 1.8rem); text-shadow: 2px 2px 8px rgba(0,0,0,0.6);">
-        Connect with people who share your interests and values.
-      </p>
+<!-- Profile Cards -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="section-title">Featured Profiles</h2>
 
-      <a href="{{ url_for('signup') }}" class="btn-primary-custom mt-3 text-decoration-none">
-        Get Started
-      </a>
-    </div>
-  </section>
+    <div class="row g-4">
+      {% for profile in profiles %}
+      <div class="col-md-4">
+        <div class="card profilecard-custom">
+          <img
+            src="{{ profile.image }}"
+            class="card-img-top uniform-img"
+            alt="{{ profile.name }}"
+          />
 
-  <!-- Feature Cards -->
-  <section class="py-5">
-    <div class="container">
-      <h2 class="section-title">Why Choose Us?</h2>
+          <div class="card-body">
+            <h5 class="card-title">{{ profile.name }}, {{ profile.age }}</h5>
 
-      <div class="row g-4">
+            <p class="card-text text-muted">{{ profile.location }}</p>
 
-        <div class="col-md-4">
-          <div class="card-custom text-center">
-            <h4>Smart Matching</h4>
-            <p>We match you based on personality and interests.</p>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card-custom text-center">
-            <h4>Secure Chat</h4>
-            <p>Talk safely with people you like.</p>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card-custom text-center">
-            <h4>Real Connections</h4>
-            <p>Build meaningful relationships.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Profile Cards -->
-  <section class="py-5 bg-light">
-    <div class="container">
-      <h2 class="section-title">Featured Profiles</h2>
-
-      <div class="row g-4">
-        {% for profile in profiles %}
-          <div class="col-md-4">
-            <div class="card profilecard-custom">
-              <img
-                src="{{ profile.image }}"
-                class="card-img-top uniform-img"
-                alt="{{ profile.name }}"
-              >
-
-              <div class="card-body">
-                <h5 class="card-title">
-                  {{ profile.name }}, {{ profile.age }}
-                </h5>
-
-                <p class="card-text text-muted">
-                  {{ profile.location }}
-                </p>
-
-                <div class="mb-3">
-                  {% for interest in profile.interests %}
-                    <span class="tag">{{ interest }}</span>
-                  {% endfor %}
-                </div>
-
-                <a
-                  href="{{ url_for('profile_detail', profile_id=profile.id) }}"
-                  class="btn btn-primary-custom w-100"
-                  style="font-size: 1rem;"
-                >
-                  View Profile
-                </a>
-              </div>
+            <div class="mb-3">
+              {% for interest in profile.interests %}
+              <span class="tag">{{ interest }}</span>
+              {% endfor %}
             </div>
+
+            <a
+              href="{{ url_for('profile_detail', profile_id=profile.id) }}"
+              class="btn btn-primary-custom w-100"
+              style="font-size: 1rem"
+            >
+              View Profile
+            </a>
           </div>
-        {% endfor %}
+        </div>
       </div>
+      {% endfor %}
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Call to Action -->
-  <section class="text-center py-5">
-    <div class="container">
-      <h2 
-        class="section-title" 
-        style="font-size: clamp(1.2rem, 5vw, 4rem);"
-      >
-        Start Your Journey Today
-      </h2>
+<!-- Call to Action -->
+<section class="text-center py-5">
+  <div class="container">
+    <h2 class="section-title" style="font-size: clamp(1.2rem, 5vw, 4rem)">
+      Start Your Journey Today
+    </h2>
 
-      <p style="font-size: clamp(0.8rem, 5vw, 1.8rem);">
-        Join now and meet amazing people.
-      </p>
+    <p style="font-size: clamp(0.8rem, 5vw, 1.8rem)">
+      Join now and meet amazing people.
+    </p>
 
-      <a href="{{ url_for('signup') }}" class="btn-secondary-custom text-decoration-none">
-        Create Account
-      </a>
-    </div>
-  </section>
+    <a
+      href="{{ url_for('signup') }}"
+      class="btn-secondary-custom text-decoration-none"
+    >
+      Create Account
+    </a>
+  </div>
+</section>
 
-{% endblock %}
-
-{% block extra_scripts %}
-  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %} {% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
