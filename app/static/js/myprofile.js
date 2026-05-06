@@ -90,6 +90,8 @@ profilePicInput.addEventListener("change", function () {
 });
 
 
+
+
 // storymodal
 
 const storyModal = document.getElementById("storyModal");
@@ -132,6 +134,7 @@ storyModal.addEventListener("click", (event) => {
   }
 });
 
+
 storyForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -139,61 +142,33 @@ storyForm.addEventListener("submit", (event) => {
     return;
   }
 
+  const titleWords = storyTitleInput.value.trim().split(/\s+/).filter(Boolean).length;
+  const descWords = storyDescriptionInput.value.trim().split(/\s+/).filter(Boolean).length;
+
+  if (titleWords > 21) {
+    alert("Title must be 21 words or less.");
+    return; // Stops the execution
+  }
+
+  if (descWords > 1500) {
+    alert("Description must be 1500 words or less.");
+    return; // Stops the execution
+  }
+
   selectedStoryCard.querySelector(".story-title").textContent = storyTitleInput.value;
   selectedStoryCard.querySelector(".story-description").textContent = storyDescriptionInput.value;
 
   const file = storyPicInput.files[0];
-
   if (file) {
     const reader = new FileReader();
-
     reader.onload = function (loadEvent) {
       selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
     };
-
     reader.readAsDataURL(file);
   }
 
   storyModal.style.display = "none";
 });
-//   event.preventDefault();
 
-//   if (!selectedStoryCard) {
-//     return;
-//   }
 
-//   // 1. Get the values
-//   const titleValue = storyTitleInput.value.trim();
-//   const descriptionValue = storyDescriptionInput.value.trim();
 
-//   // 2. Validation Logic
-  
-//   // Count words in title (splits by spaces and filters out empty strings)
-//   const titleWordCount = titleValue.split(/\s+/).filter(word => word.length > 0).length;
-//   if (titleWordCount > 21) {
-//     alert("Title is too long! Please limit it to 21 words or less.");
-//     return; // Stops the function here
-//   }
-
-//   // Count words in description (using same logic)
-//   const descWordCount = descriptionValue.split(/\s+/).filter(word => word.length > 0).length;
-//   if (descWordCount > 1500) {
-//     alert("Description is too long! Please limit it to 1500 words or less.");
-//     return; // Stops the function here
-//   }
-
-//   // 3. Apply Changes (only if validation passed)
-//   selectedStoryCard.querySelector(".story-title").textContent = titleValue;
-//   selectedStoryCard.querySelector(".story-description").textContent = descriptionValue;
-
-//   const file = storyPicInput.files[0];
-//   if (file) {
-//     const reader = new FileReader();
-//     reader.onload = function (loadEvent) {
-//       selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
-//     };
-//     reader.readAsDataURL(file);
-//   }
-
-//   storyModal.style.display = "none";
-// });
