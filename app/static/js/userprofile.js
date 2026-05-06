@@ -37,3 +37,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const bioSpan = document.getElementById("displayBio");
+  const bioModal = document.getElementById("bioViewer");
+  const bioFullText = document.getElementById("bioViewerFullText");
+  const closeBio = document.getElementById("closeBioViewer");
+  const displayName = document.querySelector(".basic-info h1").textContent;
+
+  // Open Modal
+  bioSpan.addEventListener("click", () => {
+    // Get the full text (textContent ignores the CSS clamping)
+    bioFullText.textContent = bioSpan.textContent.trim();
+    document.getElementById("bioViewerName").textContent = displayName + "'s Bio";
+    
+    bioModal.style.display = "block";
+  });
+
+  // Close Modal
+  closeBio.addEventListener("click", () => {
+    bioModal.style.display = "none";
+  });
+
+  // Close on outside click
+  window.addEventListener("click", (event) => {
+    if (event.target === bioModal) {
+      bioModal.style.display = "none";
+    }
+  });
+});

@@ -30,6 +30,36 @@
 }
 
 
+/* bio viewer */
+/* Truncate text to 2 lines and add "..." */
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Number of lines to show before ... */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Make it look interactive */
+.clickable-bio {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.clickable-bio:hover {
+  color: #007bff; /* Slight blue tint on hover to show it's clickable */
+}
+
+/* Ensure the modal text is full length */
+#bioViewerFullText {
+  white-space: pre-wrap; /* Preserves line breaks from the bio */
+  text-align: left;
+  padding: 10px;
+}
+
+
+
+
 .profile-modal {
   display: none;
   position: fixed;
