@@ -132,6 +132,13 @@ block extra_head %}
       bottom: 10px;
     }
   }
+
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: -10px;
+    margin-bottom: 10px;
+  }
 </style>
 {% endblock %} {% block content %}
 <main class="signup-page">
@@ -201,26 +208,40 @@ block extra_head %}
           <label for="confirm_password">Confirm Password</label>
         </div>
 
+        <p id="password-error" class="error-message"></p>
+
         <button class="login-btn" type="submit">Start Your Love Story</button>
       </form>
     </div>
   </div>
 </main>
-{% endblock %} {% block extra_scripts %}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document
-      .querySelector(".signup-form")
-      .addEventListener("submit", function (e) {
-        const password = document.getElementById("password").value;
-        const confirmPassword =
-          document.getElementById("confirm_password").value;
 
-        if (password !== confirmPassword) {
-          e.preventDefault();
-          alert("Passwords do not match!");
-        }
-      });
+  
+{% endblock %} 
+
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const form = document.querySelector(".signup-form");
+
+  form.addEventListener("submit", function (e) {
+
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirm_password").value;
+
+    const errorMessage = document.getElementById("password-error");
+
+    errorMessage.textContent = "";
+
+    if (password !== confirmPassword) {
+      e.preventDefault();
+
+      errorMessage.textContent = "Passwords do not match";
+    }
   });
+
+});
 </script>
 {% endblock %}
