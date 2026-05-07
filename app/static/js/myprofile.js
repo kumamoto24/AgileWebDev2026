@@ -16,6 +16,15 @@ const locationInput = document.getElementById("locationInput");
 const interestsInput = document.getElementById("interestsInput");
 const bioInput = document.getElementById("bioInput");
 
+const displayGender = document.getElementById("displayGender");
+const displayOrientation = document.getElementById("displayOrientation");
+
+const genderInput = document.getElementById("genderInput");
+const orientationInput = document.getElementById("orientationInput");
+
+const showOrientationInput = document.getElementById("showOrientationInput");
+const orientationContainer = document.getElementById("orientationContainer");
+
 editProfileBtn.addEventListener("click", (event) => {
   event.preventDefault();
   profileModal.style.display = "block";
@@ -45,7 +54,15 @@ profileForm.addEventListener("submit", (event) => {
   displayAge.textContent = ageInput.value;
   displayLocation.textContent = locationInput.value;
   displayInterests.textContent = interestsInput.value;
+  displayGender.textContent = genderInput.value;
+  displayOrientation.textContent = orientationInput.value;
   displayBio.textContent = bioInput.value;
+
+  if (showOrientationInput.checked) {
+        orientationContainer.style.display = "block";
+    } else {
+        orientationContainer.style.display = "none";
+    }
 
   profileModal.style.display = "none";
 });
