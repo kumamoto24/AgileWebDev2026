@@ -13,14 +13,27 @@ async function loadRecommendedProfiles() {
 
 async function searchProfiles() {
     const keyword = document.getElementById("keywordInput").value;
-    const location = document.getElementById("locationInput").value;
-    const locationPlaceId = document.getElementById("locationPlaceIdInput").value;
+    const locationInput = document.getElementById("locationInput");
+    const locationPlaceIdInput = document.getElementById("locationPlaceIdInput");
+    const locationLatitudeInput = document.getElementById("locationLatitudeInput");
+    const locationLongitudeInput = document.getElementById("locationLongitudeInput");
     const selectedInterests = getSelectedInterests();
+
+    const location = locationInput.value;
+    const locationPlaceId = locationPlaceIdInput.value;
+    const latitude = locationLatitudeInput.value;
+    const longitude = locationLongitudeInput.value;
+
+    if (location && !locationPlaceId) {
+      alert("Please select a location from the autocomplete suggestions.");
+      return;
+    }
 
     const queryString = new URLSearchParams({
     keyword: keyword,
-    location: location,
-    location_place_id: locationPlaceId
+    location_place_id: locationPlaceId,
+    latitude: latitude,
+    longitude: longitude
     });
 
     selectedInterests.forEach(interest => {
@@ -109,6 +122,8 @@ function updateInterestDropdownLabel() {
 async function initLocationAutocomplete() {
   const locationInput = document.getElementById("locationInput");
   const locationPlaceIdInput = document.getElementById("locationPlaceIdInput");
+  const locationLatitudeInput = document.getElementById("locationLatitudeInput");
+  const locationLongitudeInput = document.getElementById("locationLongitudeInput");
 
   if (!locationInput || !locationPlaceIdInput || !window.google?.maps?.importLibrary) {
     return;
@@ -131,6 +146,8 @@ async function initLocationAutocomplete() {
 
     locationInput.addEventListener("input", function () {
       locationPlaceIdInput.value = "";
+      locationLatitudeInput.value = "";
+      locationLongitudeInput.value = "";
     });
 
     autocomplete.addListener("place_changed", function () {
@@ -143,6 +160,14 @@ async function initLocationAutocomplete() {
         "";
 
       locationPlaceIdInput.value = place.place_id || "";
+      
+      if (place.geometry?.location) {
+        locationLatitudeInput.value = place.geometry.location.lat();
+        locationLongitudeInput.value = place.geometry.location.lng();
+      } else {
+        locationLatitudeInput.value = "";
+        locationLongitudeInput.value = "";
+      }
 
       console.log("Selected city:", {
         name: place.name,
