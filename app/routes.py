@@ -2,6 +2,53 @@ from flask import render_template, jsonify, request, redirect, url_for, current_
 from app import app
 import os
 
+from sqlalchemy import or_
+from app.models import Profile, Interest
+
+from math import radians, sin, cos, sqrt, atan2
+
+def build_profile_image_url(image_path):
+    if not image_path:
+        return url_for("static", filename="images/default-profile.png")
+
+    if image_path.startswith(("http://", "https://", "/static/")):
+        return image_path
+
+    return url_for("static", filename=image_path)
+
+
+def profile_to_card(profile, distance=None, match_score=None):
+    return {
+        "id": profile.id,
+        "name": profile.display_name,
+        "age": profile.age,
+        "location": profile.location_text,
+        "interests": [interest.name for interest in profile.interests],
+        "image": build_profile_image_url(profile.profile_image_path),
+        "distance": distance,
+        "match_score": match_score,
+    }
+
+def calculate_distance_km(lat1, lon1, lat2, lon2):
+    if None in [lat1, lon1, lat2, lon2]:
+        return None
+
+    earth_radius_km = 6371
+
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+
+    a = (
+        sin(dlat / 2) ** 2
+        + cos(radians(lat1))
+        * cos(radians(lat2))
+        * sin(dlon / 2) ** 2
+    )
+
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return round(earth_radius_km * c, 1)
+
 #Some sample profile cards to show how the webpage looks like
 sample_profiles = [
     {
@@ -74,37 +121,74 @@ def signup():
 
 @app.route("/api/recommended-profiles")
 def recommended_profiles():
-    return jsonify(sample_profiles)
+    profiles = Profile.query.order_by(Profile.created_at.desc()).limit(12).all()
+
+    return jsonify([
+        profile_to_card(profile)
+        for profile in profiles
+    ])
 
 
 @app.route("/api/search-profiles", methods=["GET", "POST"])
 def search_profiles():
-    keyword = request.args.get("keyword", "").lower()
-    location = request.args.get("location", "").lower()
-    selected_interests = request.args.getlist("interests")
+    keyword = request.args.get("keyword", "").strip()
 
-    results = sample_profiles
+    selected_interests = [
+        interest.strip()
+        for interest in request.args.getlist("interests")
+        if interest.strip()
+    ]
 
+    search_latitude = request.args.get("latitude", type=float)
+    search_longitude = request.args.get("longitude", type=float)
+
+    query = Profile.query
+
+    # Search by keyword: display name, bio, or interest name
     if keyword:
-        results = [
-            profile for profile in results
-            if keyword in profile["name"].lower()
-            or any(keyword in interest.lower() for interest in profile["interests"])
-        ]
+        keyword_pattern = f"%{keyword}%"
 
-    if location:
-        results = [
-            profile for profile in results
-            if location in profile["location"].lower()
-        ]
+        query = query.filter(
+            or_(
+                Profile.display_name.ilike(keyword_pattern),
+                Profile.bio.ilike(keyword_pattern),
+                Profile.interests.any(Interest.name.ilike(keyword_pattern))
+            )
+        )
 
+    # Search by selected interests
     if selected_interests:
-        results = [
-            profile for profile in results
-            if any(interest in profile["interests"] for interest in selected_interests)
-        ]
+        query = query.filter(
+            Profile.interests.any(Interest.name.in_(selected_interests))
+        )
 
-    return jsonify(results)
+    profiles = query.distinct().limit(50).all()
+
+    results = []
+
+    for profile in profiles:
+        distance = calculate_distance_km(
+            search_latitude,
+            search_longitude,
+            profile.latitude,
+            profile.longitude
+        )
+
+        results.append(
+            profile_to_card(profile, distance=distance)
+        )
+
+    # If the user selected a location, sort results by distance
+    if search_latitude is not None and search_longitude is not None:
+        results.sort(
+            key=lambda profile: (
+                profile["distance"]
+                if profile["distance"] is not None
+                else float("inf")
+            )
+        )
+
+    return jsonify(results[:30])
 
 
 @app.route("/profile", methods=["GET", "POST"])
