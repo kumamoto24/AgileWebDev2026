@@ -138,7 +138,10 @@ block extra_head %}
     font-size: 0.9rem;
     margin-top: -10px;
     margin-bottom: 10px;
+    font-style: italic;
   }
+
+
 </style>
 {% endblock %} {% block content %}
 <main class="signup-page">
@@ -170,7 +173,9 @@ block extra_head %}
       </p>
 
       {% if signup_error %}
-      <div class="alert alert-danger" role="alert">{{ signup_error }}</div>
+      <div class="alert alert-danger" role="alert" >
+        {{ signup_error }}
+      </div>
       {% endif %}
 
       <form class="signup-form" action="{{ url_for('signup') }}" method="post">
