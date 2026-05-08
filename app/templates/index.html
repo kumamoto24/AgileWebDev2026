@@ -1,20 +1,28 @@
 {% extends "base.html" %} {% block title %}HeartLink - Home{% endblock %} {%
 block content %} {% if not is_logged_in %}
 <!-- Login/Signup form-->
-<div id="loginModal" class="modal">
+<div
+  id="loginModal"
+  class="modal"
+  data-show-login="{{ 'true' if show_login_modal else 'false' }}"
+>
   <div class="modal-content">
     <span id="closeLogin">&times;</span>
 
     <h2 style="font-weight: 750">Login</h2>
 
+    {% if login_error %}
+    <div class="alert alert-danger" role="alert">{{ login_error }}</div>
+    {% endif %}
+
     <form action="{{ url_for('login') }}" method="post">
       <div class="input-group">
-        <input type="email" id="email" placeholder=" " required />
+        <input type="email" id="email" name="email" placeholder=" " required />
         <label for="email">Email</label>
       </div>
 
       <div class="input-group">
-        <input type="password" id="password" placeholder=" " required />
+        <input type="password" id="password" name="password" placeholder=" " required />
         <label for="password">Password</label>
       </div>
 
@@ -23,7 +31,7 @@ block content %} {% if not is_logged_in %}
         <label for="remember">Remember me</label>
       </div>
 
-      <button class="login-btn">Login</button>
+      <button class="login-btn" type="submit">Login</button>
     </form>
 
     <!-- Sign Up Link -->

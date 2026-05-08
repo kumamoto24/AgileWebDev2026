@@ -4,6 +4,14 @@ function setupLoginModal() {
   const loginModal = document.getElementById("loginModal");
   const openLogin = document.getElementById("openLogin");
   const closeLogin = document.getElementById("closeLogin");
+
+  if (!loginModal || !openLogin || !closeLogin) {
+    return;
+  }
+
+  if (loginModal.dataset.showLogin === "true") {
+    loginModal.style.display = "block";
+  }
  
   openLogin.onclick = (e) => {
     e.preventDefault();

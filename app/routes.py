@@ -272,6 +272,7 @@ def login():
             return render_template(
                 "index.html",
                 is_logged_in=False,
+                profiles=sample_profiles,
                 show_login_modal=True,
                 login_error="Please enter both email and password."
             )
@@ -284,6 +285,7 @@ def login():
             return render_template(
                 "index.html",
                 is_logged_in=False,
+                profiles=sample_profiles,
                 show_login_modal=True,
                 login_error="Invalid email or password."
             )
