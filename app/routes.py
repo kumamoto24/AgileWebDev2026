@@ -91,6 +91,11 @@ def index():
 
 @app.route("/home")
 def home():
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
+        
     return render_template(
         "logged_in_homepage.html",
         username="Demo User",
