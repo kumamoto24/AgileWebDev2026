@@ -101,48 +101,24 @@
           <input type="number" id="ageInput" value="24">
 
           <label for="locationInput">Location:</label>
-          <input id="locationInput" type="text" value="Perth, Australia">
+          <input id="locationInput" type="text" value="Perth WA, Australia">
           <input id="locationPlaceId" type="hidden">
           
           <label>Interests:</label>
             <div class="interests-container">
+              {% for interest in interests_list %}
               <div class="interest-item">
-                  <input type="checkbox" class="interest-checkbox" name="interest" value="Music" id="intMusic">
-                  <label for="intMusic">Music</label>
+                  <input type="checkbox" 
+                        class="interest-checkbox" 
+                        name="interest" 
+                        value="{{ interest }}" 
+                        id="int{{ interest }}"
+                        {% if interest in user.interests %}checked{% endif %}>
+                  <label for="int{{ interest }}">{{ interest }}</label>
               </div>
-              <div class="interest-item">
-                  <input type="checkbox" class="interest-checkbox" name="interest" value="Travel" id="intTravel">
-                  <label for="intTravel">Travel</label>
-              </div>
-              <div class="interest-item">
-                  <input type="checkbox" class="interest-checkbox" name="interest" value="Coffee" id="intCoffee">
-                  <label for="intCoffee">Coffee</label>
-              </div>
-              <div class="interest-item">
-                  <input type="checkbox" class="interest-checkbox" name="interest" value="Gaming" id="intGaming">
-                  <label for="intGaming">Gaming</label>
-              </div>
+              {% endfor %}
+
             </div>
-              <!-- <div class="interests-container">
-                <div class="interest-item">
-                    <input type="checkbox" name="interest" value="Music" id="intMusic">
-                    <label for="intMusic">Music</label>
-                </div>
-                <div class="interest-item">
-                    <input type="checkbox" name="interest" value="Travel" id="intTravel">
-                    <label for="intTravel">Travel</label>
-                </div>
-                <div class="interest-item">
-                    <input type="checkbox" name="interest" value="Coffee" id="intCoffee">
-                    <label for="intCoffee">Coffee</label>
-                </div>
-                <div class="interest-item">
-                    <input type="checkbox" name="interest" value="Gaming" id="intGaming">
-                    <label for="intGaming">Gaming</label>
-                </div>
-              </div> -->
-          <!-- <label for="interestsInput">Interests:</label>
-          <input type="text" id="interestsInput" value="Music, Movies, Fitness, Cooking"> -->
 
           <label for="genderInput">Gender:</label>
           <select id="genderInput">

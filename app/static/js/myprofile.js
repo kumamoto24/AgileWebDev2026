@@ -40,15 +40,42 @@ closeProfile.addEventListener("click", () => {
 profileForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
+  // 1. Name cannot be blank
+  if (!nameInput.value.trim()) {
+    alert("Name cannot be blank.");
+    return;
+  }
 
+  // 2. Age check (Existing)
   if (Number(ageInput.value) < 18) {
     alert("Age must be 18 or above.");
+    return;
+  }
+
+  // 3. Location must be from Google suggestions
+  // We check if the hidden 'locationPlaceId' has a value
+  const placeId = document.getElementById("locationPlaceId").value;
+  if (!placeId) {
+    alert("Please select a location from the dropdown suggestions.");
+    return;
+  }
+
+  // 4. Gender and Orientation cannot be blank
+  if (!genderInput.value || !orientationInput.value) {
+    alert("Please select your Gender and Sexual Orientation.");
     return;
   }
 
   const selectedInterests = Array.from(document.querySelectorAll('.interest-checkbox:checked')).map(cb => cb.value);
   const bioWordCount = bioInput.value.trim().split(/\s+/).filter(Boolean).length;
 
+  // 5. Interest constraint (Frontend check)
+  if (selectedInterests.length === 0) {
+    alert("Please select at least one interest.");
+    return;
+  }
+
+  // 6. Bio word limitation
   if (bioWordCount > 1000) {
     alert("Bio must be 1000 words or less.");
     return;

@@ -109,8 +109,33 @@ def search_profiles():
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
+    all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
+    
+    if request.method == "POST":
+        # Get data from form
+        submitted_name = request.form.get("name")
+        submitted_interests = request.form.getlist("interest") # 'interest' matches the 'name' attribute in HTML
+        
+        # Validation
+        if not submitted_name:
+            return "Name is required", 400
+            
+        # Security check: Ensure interest is in our master list
+        for item in submitted_interests:
+            if item not in all_interests:
+                return f"Invalid interest: {item}", 400
+        
+        # If valid, save to database/logic here
+        return redirect(url_for('profile'))
+    
+    user_data = {
+        "name": "Jane Doe",
+        "interests": ["Music", "Coffee"] # These are the ones already checked
+    }
     return render_template(
         "myprofile.html",
+        interests_list=all_interests,
+        user=user_data,
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
