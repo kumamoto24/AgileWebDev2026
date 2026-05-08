@@ -234,6 +234,10 @@ def search_profiles():
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
     return render_template(
         "myprofile.html",
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
@@ -251,11 +255,20 @@ def profile_detail(profile_id):
 # '/matches' to be deleted
 @app.route("/matches")
 def matches():
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
     return "Matches page placeholder"
 
 
 @app.route("/messages", methods=["GET", "POST"])
 def messages():
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+    
+
     return "Messages page placeholder"
 
 
