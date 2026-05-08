@@ -103,15 +103,51 @@
           <label for="locationInput">Location:</label>
           <input id="locationInput" type="text" value="Perth, Australia">
           <input id="locationPlaceId" type="hidden">
-
-          <label for="interestsInput">Interests:</label>
-          <input type="text" id="interestsInput" value="Music, Movies, Fitness, Cooking">
+          
+          <label>Interests:</label>
+            <div class="interests-container">
+              <div class="interest-item">
+                  <input type="checkbox" class="interest-checkbox" name="interest" value="Music" id="intMusic">
+                  <label for="intMusic">Music</label>
+              </div>
+              <div class="interest-item">
+                  <input type="checkbox" class="interest-checkbox" name="interest" value="Travel" id="intTravel">
+                  <label for="intTravel">Travel</label>
+              </div>
+              <div class="interest-item">
+                  <input type="checkbox" class="interest-checkbox" name="interest" value="Coffee" id="intCoffee">
+                  <label for="intCoffee">Coffee</label>
+              </div>
+              <div class="interest-item">
+                  <input type="checkbox" class="interest-checkbox" name="interest" value="Gaming" id="intGaming">
+                  <label for="intGaming">Gaming</label>
+              </div>
+            </div>
+              <!-- <div class="interests-container">
+                <div class="interest-item">
+                    <input type="checkbox" name="interest" value="Music" id="intMusic">
+                    <label for="intMusic">Music</label>
+                </div>
+                <div class="interest-item">
+                    <input type="checkbox" name="interest" value="Travel" id="intTravel">
+                    <label for="intTravel">Travel</label>
+                </div>
+                <div class="interest-item">
+                    <input type="checkbox" name="interest" value="Coffee" id="intCoffee">
+                    <label for="intCoffee">Coffee</label>
+                </div>
+                <div class="interest-item">
+                    <input type="checkbox" name="interest" value="Gaming" id="intGaming">
+                    <label for="intGaming">Gaming</label>
+                </div>
+              </div> -->
+          <!-- <label for="interestsInput">Interests:</label>
+          <input type="text" id="interestsInput" value="Music, Movies, Fitness, Cooking"> -->
 
           <label for="genderInput">Gender:</label>
           <select id="genderInput">
               <option value="Man">Man</option>
               <option value="Woman">Woman</option>
-              <option value="Non-binary">Non-binary</option>
               <option value="Other">Other</option>
           </select>
 
@@ -120,9 +156,6 @@
               <option value="Straight">Straight</option>
               <option value="Gay">Gay</option>
               <option value="Lesbian">Lesbian</option>
-              <option value="Bisexual">Bisexual</option>
-              <option value="Queer">Queer</option>
-              <option value="Asexual">Asexual</option>
               <option value="Other">Other</option>
           </select>
 

@@ -13,7 +13,9 @@ const displayBio = document.getElementById("displayBio");
 const nameInput = document.getElementById("nameInput");
 const ageInput = document.getElementById("ageInput");
 const locationInput = document.getElementById("locationInput");
-const interestsInput = document.getElementById("interestsInput");
+// const interestsInput = document.getElementById("interestsInput");
+
+
 const bioInput = document.getElementById("bioInput");
 
 const displayGender = document.getElementById("displayGender");
@@ -38,11 +40,13 @@ closeProfile.addEventListener("click", () => {
 profileForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
+
   if (Number(ageInput.value) < 18) {
     alert("Age must be 18 or above.");
     return;
   }
 
+  const selectedInterests = Array.from(document.querySelectorAll('.interest-checkbox:checked')).map(cb => cb.value);
   const bioWordCount = bioInput.value.trim().split(/\s+/).filter(Boolean).length;
 
   if (bioWordCount > 1000) {
@@ -53,7 +57,8 @@ profileForm.addEventListener("submit", (event) => {
   displayName.textContent = nameInput.value;
   displayAge.textContent = ageInput.value;
   displayLocation.textContent = locationInput.value;
-  displayInterests.textContent = interestsInput.value;
+  // displayInterests.textContent = interestsInput.value;
+  displayInterests.textContent = selectedInterests.join(", ");
   displayGender.textContent = genderInput.value;
   displayOrientation.textContent = orientationInput.value;
   displayBio.textContent = bioInput.value;
