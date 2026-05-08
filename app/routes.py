@@ -32,6 +32,8 @@ sample_profiles = [
         "distance": 10.2,
     },
 ]
+all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
+    
 
 
 @app.route("/")
@@ -109,7 +111,6 @@ def search_profiles():
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
-    all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
     
     if request.method == "POST":
         # Get data from form
