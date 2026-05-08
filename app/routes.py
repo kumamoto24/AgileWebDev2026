@@ -1,6 +1,9 @@
 from flask import render_template, jsonify, request, redirect, url_for, current_app
 from app import app
 import os
+#Database acess
+from app.models import User
+from app import db
 
 from sqlalchemy import or_
 from app.models import Profile, Interest
@@ -102,22 +105,56 @@ def logout():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
+
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
+        confirm_password = request.form.get("confirm_password", "").strip()
 
-        if not username or not email or not password:
+        #Check required fields
+        if not email or not password or not confirm_password:
             return render_template(
                 "signup.html",
                 is_logged_in=False,
                 signup_error="Please complete all required fields."
             )
 
-        # Placeholder flow until database/user authentication is implemented.
-        return redirect(url_for("home"))
+        #Check passwords match
+        if password != confirm_password:
+            return render_template(
+                "signup.html",
+                is_logged_in=False,
+                signup_error="Passwords do not match."
+            )
 
-    return render_template("signup.html", is_logged_in=False)
+        #Check duplicate email
+        existing_user = User.query.filter_by(email=email).first()
+
+        if existing_user:
+            return render_template(
+                "signup.html",
+                is_logged_in=False,
+                signup_error="Email already registered."
+            )
+
+        #Create new user
+        new_user = User(email=email)
+
+        #Hash password
+        new_user.set_password(password)
+
+        #Save to database
+        db.session.add(new_user)
+        db.session.commit()
+
+        #Redirect after successful signup
+        return redirect(url_for("login"))
+
+    return render_template(
+        "signup.html",
+        is_logged_in=False
+    )
 
 @app.route("/api/recommended-profiles")
 def recommended_profiles():
