@@ -92,13 +92,15 @@ def index():
 @app.route("/home")
 def home():
 
+    print("SESSION:", dict(session))
+
     if "user_id" not in session:
         return redirect(url_for("index"))
 
-        
+
     return render_template(
         "logged_in_homepage.html",
-        username="Demo User",
+        username= session.get("email"),
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
