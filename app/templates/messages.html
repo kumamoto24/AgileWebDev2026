@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}HeartLink | Messages{% endblock %}
+
+{% block extra_head %}
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/messages.css') }}"
+  >
+{% endblock %}
+
+{% block content %}
+  <main
+    class="messages-page"
+    data-current-profile-id="{{ current_profile.id if current_profile else '' }}"
+    data-current-profile-name="{{ current_profile.display_name if current_profile else 'You' }}"
+  >
+    <section class="messages-shell">
+      <aside class="conversation-sidebar" aria-label="Conversations">
+        <div class="messages-panel-header">
+          <div>
+            <p class="messages-kicker">HeartLink Chat</p>
+            <h1>Messages</h1>
+          </div>
+          <span class="connection-status" id="connectionStatus">
+            <span class="connection-dot"></span>
+            <span id="connectionStatusText">Offline</span>
+          </span>
+        </div>
+
+        <label class="conversation-search" for="conversationSearch">
+          <i class="bi bi-search"></i>
+          <input
+            type="search"
+            id="conversationSearch"
+            placeholder="Search conversations"
+            autocomplete="off"
+          >
+        </label>
+
+        <div class="conversation-list" id="conversationList">
+          {% for contact in contacts %}
+            <button
+              class="conversation-item"
+              type="button"
+              data-contact-id="{{ contact.id }}"
+              data-contact-name="{{ contact.name }}"
+              data-contact-image="{{ contact.image }}"
+            >
+              <img src="{{ contact.image }}" alt="{{ contact.name }}">
+              <span class="conversation-copy">
+                <span class="conversation-name">{{ contact.name }}</span>
+                <span class="conversation-preview">Start a conversation</span>
+              </span>
+              <span class="conversation-time">New</span>
+            </button>
+          {% else %}
+            <div class="empty-conversations">
+              <i class="bi bi-chat-heart"></i>
+              <p>No matches yet.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </aside>
+
+      <section class="chat-panel" aria-label="Selected conversation">
+        <header class="chat-header">
+          <div class="chat-person">
+            <img
+              id="activeContactImage"
+              src="{{ url_for('static', filename='default-profile.png') }}"
+              alt=""
+            >
+            <div>
+              <h2 id="activeContactName">Select a conversation</h2>
+              <p id="activeContactStatus">Choose someone from your matches</p>
+            </div>
+          </div>
+        </header>
+
+        <div class="message-thread" id="messageThread">
+          <div class="empty-chat">
+            <i class="bi bi-chat-dots"></i>
+            <h3>Your conversations will appear here</h3>
+            <p>Select a match to start chatting in real time.</p>
+          </div>
+        </div>
+
+        <p class="typing-indicator" id="typingIndicator" aria-live="polite"></p>
+
+        <form class="message-composer" id="messageComposer">
+          <textarea
+            id="messageInput"
+            rows="1"
+            maxlength="1000"
+            placeholder="Write a message"
+            disabled
+          ></textarea>
+          <button type="submit" id="sendMessageButton" disabled aria-label="Send message">
+            <i class="bi bi-send-fill"></i>
+          </button>
+        </form>
+      </section>
+    </section>
+  </main>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+{% endblock %}

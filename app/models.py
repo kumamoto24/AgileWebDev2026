@@ -132,3 +132,73 @@ class Story(db.Model):
             name="uq_profile_story_order"
         ),
     )
+
+
+
+class Conversation(db.Model):
+    __tablename__ = "conversation"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    profile1_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    profile2_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
+    messages = db.relationship(
+        "Message",
+        backref="conversation",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "profile1_id",
+            "profile2_id",
+            name="uq_conversation_profiles"
+        ),
+    )
+
+
+class Message(db.Model):
+    __tablename__ = "message"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    conversation_id = db.Column(
+        db.Integer,
+        db.ForeignKey("conversation.id"),
+        nullable=False
+    )
+
+    sender_profile_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    receiver_profile_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    body = db.Column(db.Text, nullable=False)
+
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc)
+    )
