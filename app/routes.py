@@ -414,6 +414,31 @@ def profile_detail(profile_id):
         profile_id=profile_id
     )
 
+@app.route("/profile/<int:profile_id>/like", methods=["POST"])
+def handle_like(profile_id):
+    # This logic only runs when the 'Like' button is clicked, 
+    # it does not load a new page.
+    data = request.get_json()
+    print(f"Received {data.get('action')} for profile {profile_id}")
+    return jsonify({"status": "success"}), 200
+
+
+@app.route("/profile/update", methods=["POST"])
+def update_profile():
+    data = request.get_json()
+
+    return jsonify({"status": "success", "message": "Profile updated"}), 200
+
+
+@app.route("/story/update", methods=["POST"])
+def update_story():
+    title = request.form.get("title")
+    description = request.form.get("description")
+    image_file = request.files.get("story_image")
+    
+    # Validation and save logic...
+    return jsonify({"status": "success"}), 200
+
 # '/matches' to be deleted
 @app.route("/matches")
 def matches():

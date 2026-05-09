@@ -36,6 +36,7 @@
             id="profilePicInput"
             name="profilePicture"
             accept="image/*"
+            form="profileForm"
             hidden
           >
         </div>
@@ -82,7 +83,7 @@
       </div>
 
       <div id="profileModal" class="profile-modal">
-        <form id="profileForm" class="profile-popup">
+        <form id="profileForm" class="profile-popup" method="POST" action="/update-profile">
           <button
             id="closeProfile"
             class="close"
@@ -95,40 +96,39 @@
           <h1>Edit Profile</h1>
 
           <label for="nameInput">Name:</label>
-          <input type="text" id="nameInput" value="Jane Doe">
+          <input type="text" id="nameInput" name="display_name" value="Jane Doe">
 
           <label for="ageInput">Age:</label>
-          <input type="number" id="ageInput" value="24">
+          <input type="number" id="ageInput" name="age" value="24">
 
           <label for="locationInput">Location:</label>
-          <input id="locationInput" type="text" value="Perth WA, Australia">
-          <input id="locationPlaceId" type="hidden">
+          <input id="locationInput" name="location_text" type="text" value="Perth WA, Australia">
+          <input id="locationPlaceId" name="place_id" type="hidden">
           
           <label>Interests:</label>
-            <div class="interests-container">
-              {% for interest in interests_list %}
-              <div class="interest-item">
-                  <input type="checkbox" 
-                        class="interest-checkbox" 
-                        name="interest" 
-                        value="{{ interest }}" 
-                        id="int{{ interest }}"
-                        {% if interest in user.interests %}checked{% endif %}>
-                  <label for="int{{ interest }}">{{ interest }}</label>
-              </div>
-              {% endfor %}
-
+          <div class="interests-container">
+            {% for interest in interests_list %}
+            <div class="interest-item">
+                <input type="checkbox" 
+                      class="interest-checkbox" 
+                      name="interest" 
+                      value="{{ interest }}" 
+                      id="int{{ interest }}"
+                      {% if interest in user.interests %}checked{% endif %}>
+                <label for="int{{ interest }}">{{ interest }}</label>
             </div>
+            {% endfor %}
+          </div>
 
           <label for="genderInput">Gender:</label>
-          <select id="genderInput">
+          <select id="genderInput" name="gender">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
           </select>
 
           <label for="orientationInput">Sexual Orientation:</label>
-          <select id="orientationInput">
+          <select id="orientationInput" name="orientation">
               <option value="Straight">Straight</option>
               <option value="Gay">Gay</option>
               <option value="Lesbian">Lesbian</option>
@@ -136,8 +136,7 @@
           </select>
 
           <label for="bioInput">Bio:</label>
-          <textarea id="bioInput">I love coffee, music, traveling, and meeting new people.</textarea>
-
+          <textarea id="bioInput" name="bio">I love coffee, music, traveling, and meeting new people.</textarea>
           <button type="submit" class="btn btn-success">Save</button>
         </form>
       </div>
@@ -200,7 +199,8 @@
       </div>
 
       <div id="storyModal" class="profile-modal">
-        <form id="storyForm" class="profile-popup">
+        <!-- Added method, action, and enctype -->
+        <form id="storyForm" class="profile-popup" method="POST" action="/update-story" enctype="multipart/form-data">
           <button
             id="closeStory"
             class="close"
@@ -213,13 +213,19 @@
           <h1>Edit Story</h1>
 
           <label for="storyPicInput">Story picture:</label>
-          <input type="file" id="storyPicInput" accept="image/*">
+          <!-- name="image_path" matches the DB column -->
+          <input type="file" id="storyPicInput" name="image_path" accept="image/*">
 
           <label for="storyTitleInput">Title:</label>
-          <input type="text" id="storyTitleInput" maxlength="21">
+          <!-- name="title" matches the DB column -->
+          <input type="text" id="storyTitleInput" name="title" maxlength="21">
 
           <label for="storyDescriptionInput">Description:</label>
-          <textarea id="storyDescriptionInput" maxlength="1500"></textarea>
+          <!-- name="description" matches the DB column -->
+          <textarea id="storyDescriptionInput" name="description" maxlength="1500"></textarea>
+          
+          <!-- Hidden input for display_order (optional but helpful for your teammate) -->
+          <input type="hidden" name="display_order" id="storyOrderInput" value="1">
 
           <button type="submit" class="btn btn-success">Save</button>
         </form>
