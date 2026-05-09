@@ -22,6 +22,41 @@
   cursor: pointer;
 }
 
+.btn-like {
+  background-color: #e94e77; /* Your signature pink */
+  color: white;
+  padding: 8px 20px;
+  border-radius: 100px;
+  border: none;
+  font-weight: bold;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Hover State */
+.btn-like:hover {
+  background-color: #d63c65;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 78, 119, 0.3);
+}
+
+/* Active/Liked State */
+.btn-like.active {
+  background-color: #b52b50;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon scaling */
+.btn-like i {
+  font-size: 1.4rem;
+}
+
+
 .basic-info {
   background: white;
   border-radius: 16px;

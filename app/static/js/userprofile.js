@@ -1,3 +1,35 @@
+// Like button
+
+function toggleLike(profileId) {
+    const likeBtn = document.getElementById('likeBtn');
+    const isLiked = likeBtn.classList.toggle('active');
+    
+    // Update text or icon visually
+    if (isLiked) {
+        likeBtn.innerHTML = '❤️ Liked';
+    } else {
+        likeBtn.innerHTML = '🤍 Like';
+    }
+
+    // fetch(`/profile/${profileId}/like`, {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ liked: isLiked })
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     console.log('Success:', data);
+    // })
+    // .catch((error) => {
+    //     console.error('Error updating like:', error);
+    // });
+  }
+
+
+
+// Story
 document.addEventListener("DOMContentLoaded", () => {
   const viewer = document.getElementById("storyViewer");
   const viewerImg = document.getElementById("viewerImg");
