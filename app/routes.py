@@ -9,6 +9,7 @@ from app.models import Profile, Interest, User
 
 from math import radians, sin, cos, sqrt, atan2
 
+#Helper function: Load image
 def build_profile_image_url(image_path):
     if not image_path:
         return url_for("static", filename="images/default-profile.png")
@@ -18,7 +19,7 @@ def build_profile_image_url(image_path):
 
     return url_for("static", filename=image_path)
 
-
+#Helper function: Convert progiles to cards
 def profile_to_card(profile, distance=None, match_score=None):
     return {
         "id": profile.id,
@@ -31,6 +32,7 @@ def profile_to_card(profile, distance=None, match_score=None):
         "match_score": match_score,
     }
 
+# Helper function: Calculate distance
 def calculate_distance_km(lat1, lon1, lat2, lon2):
     if None in [lat1, lon1, lat2, lon2]:
         return None
@@ -81,9 +83,65 @@ sample_profiles = [
         "distance": 10.2,
     },
 ]
+# Interest list (global)
 all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
-    
 
+# Helper function: filter compatible recommended candidate
+def compatible(current_profile, candidate):
+    current_gender = current_profile.gender.lower()
+    current_orientation = current_profile.orientation.lower()
+
+    candidate_gender = candidate.gender.lower()
+
+    if current_orientation == "straight":
+        if current_gender == "male":
+            return candidate_gender == "female"
+        if current_gender == "female":
+            return candidate_gender == "male"
+        return True
+
+    if current_orientation == "gay":
+        return current_gender == candidate_gender
+
+    if current_orientation == "lesbian":
+        return current_gender == "female" and candidate_gender == "female"
+
+    # For "other", keep the filter open for now
+    return True
+
+# Helper function: Calculate match score
+def calculate_match_score(shared_interest_count, distance, candidate):
+    interest_score = min(shared_interest_count * 10, 30)
+
+    if distance is None:
+        distance_score = 0
+    elif distance <= 5:
+        distance_score = 60
+    elif distance <= 10:
+        distance_score = 55
+    elif distance <= 20:
+        distance_score = 50
+    elif distance <= 50:
+        distance_score = 35
+    elif distance <= 100:
+        distance_score = 20
+    elif distance <= 500:
+        distance_score = 5
+    else:
+        distance_score = 0
+
+    completeness_score = 0
+
+    if candidate.bio:
+        completeness_score += 3
+
+    if candidate.profile_image_path:
+        completeness_score += 3
+
+    if candidate.interests:
+        completeness_score += 4
+
+    return interest_score + distance_score + completeness_score
 
 @app.route("/")
 @app.route("/index")
@@ -93,16 +151,18 @@ def index():
 
 @app.route("/home")
 def home():
+    # Temporary: use the first profile as the current user profile
+    current_profile = Profile.query.first()
 
-    print("SESSION:", dict(session))
-
-    if "user_id" not in session:
-        return redirect(url_for("index"))
-
+    username = (
+        current_profile.display_name
+        if current_profile
+        else "Demo User"
+    )
 
     return render_template(
         "logged_in_homepage.html",
-        username= session.get("email"),
+        username=username,
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
@@ -170,15 +230,65 @@ def signup():
 
 @app.route("/api/recommended-profiles")
 def recommended_profiles():
-    profiles = Profile.query.order_by(Profile.created_at.desc()).limit(12).all()
+    # Temporary: use the first profile as the current user profile (login has not been developed)
+    current_profile = Profile.query.first()
 
-    return jsonify([
-        profile_to_card(profile)
-        for profile in profiles
-    ])
+    if not current_profile:
+        return jsonify([])
+
+    current_interest_names = {
+        interest.name for interest in current_profile.interests
+    }
+
+    candidate_profiles = (
+        Profile.query
+        .filter(Profile.id != current_profile.id)
+        .all()
+    )
+
+    recommendations = []
+
+    for candidate in candidate_profiles:
+        if not compatible(current_profile, candidate):
+            continue
+
+        candidate_interest_names = {
+            interest.name for interest in candidate.interests
+        }
+
+        shared_interests = current_interest_names.intersection(candidate_interest_names)
+        shared_interest_count = len(shared_interests)
+
+        distance = calculate_distance_km(
+            current_profile.latitude,
+            current_profile.longitude,
+            candidate.latitude,
+            candidate.longitude
+        )
+
+        match_score = calculate_match_score(
+            shared_interest_count=shared_interest_count,
+            distance=distance,
+            candidate=candidate
+        )
+
+        recommendations.append(
+            profile_to_card(
+                candidate,
+                distance=distance,
+                match_score=match_score
+            )
+        )
+
+    recommendations.sort(
+        key=lambda profile: profile["match_score"],
+        reverse=True
+    )
+
+    return jsonify(recommendations[:12])
 
 
-@app.route("/api/search-profiles", methods=["GET", "POST"])
+@app.route("/api/search-profiles", methods=["GET"])
 def search_profiles():
     keyword = request.args.get("keyword", "").strip()
 
@@ -190,54 +300,74 @@ def search_profiles():
 
     search_latitude = request.args.get("latitude", type=float)
     search_longitude = request.args.get("longitude", type=float)
+    radius_km = request.args.get("radius_km", default=10, type=float)
+
+    # Temporary: use the first profile in the database as the current user.
+    current_profile = Profile.query.order_by(Profile.id.asc()).first()
+
+    if current_profile is None:
+        return jsonify({
+            "profiles": []
+        })
 
     query = Profile.query
 
-    # Search by keyword: display name, bio, or interest name
-    if keyword:
-        keyword_pattern = f"%{keyword}%"
+    # Do not return the current user's own profile.
+    query = query.filter(Profile.id != current_profile.id)
 
+    if keyword:
         query = query.filter(
-            or_(
-                Profile.display_name.ilike(keyword_pattern),
-                Profile.bio.ilike(keyword_pattern),
-                Profile.interests.any(Interest.name.ilike(keyword_pattern))
+            db.or_(
+                Profile.display_name.ilike(f"%{keyword}%"),
+                Profile.bio.ilike(f"%{keyword}%"),
+                Profile.location_text.ilike(f"%{keyword}%")
             )
         )
 
-    # Search by selected interests
     if selected_interests:
-        query = query.filter(
-            Profile.interests.any(Interest.name.in_(selected_interests))
+        query = (
+            query
+            .join(Profile.interests)
+            .filter(Interest.name.in_(selected_interests))
+            .distinct()
         )
 
-    profiles = query.distinct().limit(50).all()
+    candidate_profiles = query.all()
 
     results = []
 
-    for profile in profiles:
-        distance = calculate_distance_km(
-            search_latitude,
-            search_longitude,
+    for profile in candidate_profiles:
+        # 1. Search bar location is used only to filter search results.
+        if search_latitude is not None and search_longitude is not None:
+            distance_from_search_location = calculate_distance_km(
+                search_latitude,
+                search_longitude,
+                profile.latitude,
+                profile.longitude
+            )
+            # Threshold: 10km
+            if distance_from_search_location > radius_km:
+                continue
+
+        # 2. Profile card distance is calculated from the current user's location.
+        distance_from_current_user = calculate_distance_km(
+            current_profile.latitude,
+            current_profile.longitude,
             profile.latitude,
             profile.longitude
         )
 
-        results.append(
-            profile_to_card(profile, distance=distance)
-        )
+        results.append({
+            "id": profile.id,
+            "name": profile.display_name,
+            "age": profile.age,
+            "location": profile.location_text,
+            "interests": [interest.name for interest in profile.interests],
+            "image": build_profile_image_url(profile.profile_image_path),
+            "distance": distance_from_current_user
+        })
 
-    # If the user selected a location, sort results by distance
-    if search_latitude is not None and search_longitude is not None:
-        results.sort(
-            key=lambda profile: (
-                profile["distance"]
-                if profile["distance"] is not None
-                else float("inf")
-            )
-        )
-
-    return jsonify(results[:30])
+    return jsonify(results)
 
 
 @app.route("/profile", methods=["GET", "POST"])
