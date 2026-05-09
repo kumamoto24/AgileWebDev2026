@@ -3,11 +3,31 @@ from app import app
 import os
 #Database acess
 from app import db
-
 from sqlalchemy import or_
 from app.models import Profile, Interest, User
 
 from math import radians, sin, cos, sqrt, atan2
+
+#From Profile wrapper function
+from functools import wraps
+
+
+
+def profile_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+
+        if "user_id" not in session:
+            return redirect(url_for("index"))
+
+        profile = Profile.query.filter_by(user_id=session["user_id"]).first()
+
+        if not profile:
+            return redirect(url_for("profile"))
+
+        return f(*args, **kwargs)
+
+    return wrapper
 
 #Helper function: Load image
 def build_profile_image_url(image_path):
@@ -150,9 +170,13 @@ def index():
 
 
 @app.route("/home")
+@profile_required
 def home():
     # Temporary: use the first profile as the current user profile
-    current_profile = Profile.query.first()
+    current_profile = Profile.query.filter_by(user_id=session["user_id"]).first()
+
+    if not current_profile:
+        return redirect(url_for("profile"))
 
     username = (
         current_profile.display_name
@@ -221,7 +245,7 @@ def signup():
         db.session.commit()
 
         #Redirect after successful signup
-        return redirect(url_for("login"))
+        return redirect(url_for("home"))
 
     return render_template(
         "signup.html",
@@ -416,6 +440,7 @@ def profile_detail(profile_id):
 
 # '/matches' to be deleted
 @app.route("/matches")
+@profile_required
 def matches():
 
     if "user_id" not in session:
@@ -425,6 +450,7 @@ def matches():
 
 
 @app.route("/messages", methods=["GET", "POST"])
+@profile_required
 def messages():
 
     if "user_id" not in session:
