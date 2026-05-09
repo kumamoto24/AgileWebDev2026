@@ -47,13 +47,13 @@ class Profile(db.Model):
 
     display_name = db.Column(db.String(80), nullable=False)
     bio = db.Column(db.Text)
-    age = db.Column(db.Integer)
-    gender = db.Column(db.String(30))
-
-    location_text = db.Column(db.String(120), index=True)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-    place_id = db.Column(db.String(128))
+    age = db.Column(db.Integer, nullable=False)
+    gender = db.Column(db.String(30), nullable=False)
+    orientation = db.Column(db.String(30), nullable=False)
+    location_text = db.Column(db.String(120), index=True,nullable=False)
+    latitude = db.Column(db.Float,nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    place_id = db.Column(db.String(128), nullable=False)
 
     profile_image_path = db.Column(db.String(255))
 
@@ -88,7 +88,6 @@ class Interest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(50), unique=True, nullable=False, index=True)
-    category = db.Column(db.String(50), index=True)
 
     profiles = db.relationship(
         "Profile",
