@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, request, redirect, url_for, current_app, session
+from flask import flash, render_template, jsonify, request, redirect, url_for, current_app, session
 from app import app
 import os
 #Database acess
@@ -123,7 +123,13 @@ def signup():
                 is_logged_in=False,
                 signup_error="Please complete all required fields."
             )
-
+        # Password length validation
+        if len(password) < 8 or len(password) > 64:
+            return render_template(
+                "signup.html",
+                is_logged_in=False,
+                signup_error="Password must be between 8 and 64 characters."
+            )
         #Check passwords match
         if password != confirm_password:
             return render_template(
