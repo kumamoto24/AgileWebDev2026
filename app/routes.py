@@ -1,12 +1,11 @@
-from flask import render_template, jsonify, request, redirect, url_for, current_app
+from flask import flash, render_template, jsonify, request, redirect, url_for, current_app, session
 from app import app
 import os
 #Database acess
-from app.models import User
 from app import db
 
 from sqlalchemy import or_
-from app.models import Profile, Interest
+from app.models import Profile, Interest, User
 
 from math import radians, sin, cos, sqrt, atan2
 
@@ -94,16 +93,21 @@ def index():
 
 @app.route("/home")
 def home():
+
+    print("SESSION:", dict(session))
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
+
     return render_template(
         "logged_in_homepage.html",
-        username="Demo User",
+        username= session.get("email"),
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
 
-@app.route("/logout", methods=["GET", "POST"])
-def logout():
-    return "Logout placeholder"
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -121,7 +125,13 @@ def signup():
                 is_logged_in=False,
                 signup_error="Please complete all required fields."
             )
-
+        # Password length validation
+        if len(password) < 8 or len(password) > 64:
+            return render_template(
+                "signup.html",
+                is_logged_in=False,
+                signup_error="Password must be between 8 and 64 characters."
+            )
         #Check passwords match
         if password != confirm_password:
             return render_template(
@@ -232,6 +242,10 @@ def search_profiles():
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
     
     if request.method == "POST":
         # Get data from form
@@ -273,33 +287,58 @@ def profile_detail(profile_id):
 # '/matches' to be deleted
 @app.route("/matches")
 def matches():
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
     return "Matches page placeholder"
 
 
 @app.route("/messages", methods=["GET", "POST"])
 def messages():
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+    
+
     return "Messages page placeholder"
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Use the login form/modal inside index.html instead of a separate login page."""
+
     if request.method == "POST":
+
         email = request.form.get("email", "").strip()
-        password = request.form.get("password", "")
+        password = request.form.get("password", "").strip()
 
-        # Temporary demo login logic.
-        # Replace this with real database authentication later.
-        if email and password:
-            return redirect(url_for("home"))
+        #Validating input
+        if not email or not password:
+            return render_template(
+                "index.html",
+                is_logged_in=False,
+                show_login_modal=True,
+                login_error="Please enter both email and password."
+            )
 
-        return render_template(
-            "index.html",
-            is_logged_in=False,
-            profiles=sample_profiles,
-            show_login_modal=True,
-            login_error="Please enter both email and password."
-        )
+        #Find user in DB
+        user = User.query.filter_by(email=email).first()
+
+        #Check user exists + password is correct
+        if not user or not user.check_password(password):
+            return render_template(
+                "index.html",
+                is_logged_in=False,
+                show_login_modal=True,
+                login_error="Invalid email or password."
+            )
+
+        #Create session
+        session["user_id"] = user.id
+        session["email"] = user.email
+
+        #Redirect after login
+        return redirect(url_for("home"))
 
     return render_template(
         "index.html",
@@ -307,3 +346,9 @@ def login():
         profiles=sample_profiles,
         show_login_modal=True
     )
+
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
