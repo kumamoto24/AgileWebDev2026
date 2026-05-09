@@ -140,98 +140,31 @@ profileForm.addEventListener("submit", async (event) => {
       orientationContainer.style.display = showOrientationInput.checked ? "block" : "none";
   }
 
-  // Close Modal
-  profileModal.style.display = "none";
+
+  const profileData = { name: nameValue, interests: selectedInterests /* etc */ };
+
+  try {
+      const response = await fetch("/profile/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profileData)
+      });
+
+      if (response.ok) {
+          // 3. ONLY IF SUCCESSFUL: Update UI and close modal
+          displayName.textContent = nameValue;
+          displayInterests.textContent = selectedInterests.join(", ");
+          
+          profileModal.style.display = "none"; // Close here!
+          alert("Profile updated!");
+      } else {
+          alert("Server error. Your changes were not saved.");
+      }
+  } catch (error) {
+      alert("Network error. Please check your connection.");
+  }
 });
-// profileForm.addEventListener("submit", async(event) => {
-//   event.preventDefault();
 
-//   const nameValue = nameInput.value.trim();
-
-//   // 1. Name cannot be blank
-//   if (!nameInput.value.trim()) {
-//   if (!nameValue) {
-//     alert("Name cannot be blank.");
-//     return;
-//   }
-
-//   const nameRegex = /^[A-Za-z\s\-']+$/;
-
-//   if (!nameRegex.test(nameValue)) {
-//     alert("Name can only contain letters, spaces, hyphens, and apostrophes.");
-//     return;
-//   }
-
-//   if (nameValue.length < 2) {
-//     alert("Name must be at least 2 characters long.");
-//     return;
-//   }
-
-//   // 2. Age check (Existing)
-//   if (Number(ageInput.value) < 18) {
-//     alert("Age must be 18 or above.");
-//     return;
-//   }
-
-//   // 3. Location must be from Google suggestions
-//   // We check if the hidden 'locationPlaceId' has a value
-//   const locInput = document.getElementById("locationInput");
-//   const locIdInput = document.getElementById("locationPlaceIdInput"); // Ensure this ID exists in HTML
-  
-//   let placeId = locIdInput.value;
-
-//   // If the user typed manually and didn't trigger 'place_changed'
-//   if (!placeId && locInput.value.trim()) {
-//       const verified = await verifyLocationManually(locInput.value.trim());
-//       if (verified) {
-//           locIdInput.value = verified.place_id;
-//           locInput.value = verified.description;
-//           placeId = verified.place_id;
-//       }
-//   }
-
-//   if (!placeId) {
-//       alert("Please select a valid city in Australia from the suggestions.");
-//       return;
-//   }
-
-//   // const placeId = document.getElementById("locationPlaceId").value;
-//   // if (!placeId) {
-//   //   alert("Please select a location from the dropdown suggestions.");
-//   //   return;
-//   // }
-
-//   // 4. Gender and Orientation cannot be blank
-//   if (!genderInput.value || !orientationInput.value) {
-//     alert("Please select your Gender and Sexual Orientation.");
-//     return;
-//   }
-
-//   const selectedInterests = Array.from(document.querySelectorAll('.interest-checkbox:checked')).map(cb => cb.value);
-//   const bioWordCount = bioInput.value.trim().split(/\s+/).filter(Boolean).length;
-
-//   // 5. Interest constraint (Frontend check)
-//   if (selectedInterests.length === 0) {
-//     alert("Please select at least one interest.");
-//     return;
-//   }
-
-//   // 6. Bio word limitation
-//   if (bioWordCount > 1000) {
-//     alert("Bio must be 1000 words or less.");
-//     return;
-//   }
-
-//   displayName.textContent = nameInput.value;
-//   displayAge.textContent = ageInput.value;
-//   displayLocation.textContent = locationInput.value;
-//   // displayInterests.textContent = interestsInput.value;
-//   displayInterests.textContent = selectedInterests.join(", ");
-//   displayGender.textContent = genderInput.value;
-//   displayOrientation.textContent = orientationInput.value;
-//   displayBio.textContent = bioInput.value;
-//   profileModal.style.display = "none";
-// });
 
 function initAutocomplete() {
   if (!window.google) {
@@ -318,40 +251,112 @@ storyModal.addEventListener("click", (event) => {
 });
 
 
-storyForm.addEventListener("submit", (event) => {
+storyForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!selectedStoryCard) {
     return;
   }
 
-  const titleWords = storyTitleInput.value.trim().split(/\s+/).filter(Boolean).length;
-  const descWords = storyDescriptionInput.value.trim().split(/\s+/).filter(Boolean).length;
+  // --- 1. Validation Logic ---
+  const titleValue = storyTitleInput.value.trim();
+  const descValue = storyDescriptionInput.value.trim();
+  
+  const titleWords = titleValue.split(/\s+/).filter(Boolean).length;
+  const descWords = descValue.split(/\s+/).filter(Boolean).length;
 
   if (titleWords > 21) {
     alert("Title must be 21 words or less.");
-    return; // Stops the execution
+    return;
   }
 
   if (descWords > 1500) {
     alert("Description must be 1500 words or less.");
-    return; // Stops the execution
+    return;
   }
 
-  selectedStoryCard.querySelector(".story-title").textContent = storyTitleInput.value;
-  selectedStoryCard.querySelector(".story-description").textContent = storyDescriptionInput.value;
-
+  // --- 2. Prepare Data for Backend ---
+  // Using FormData because it handles file uploads (images) automatically
+  const formData = new FormData();
+  formData.append("title", titleValue);
+  formData.append("description", descValue);
+  
+  // Get the file from input
   const file = storyPicInput.files[0];
   if (file) {
-    const reader = new FileReader();
-    reader.onload = function (loadEvent) {
-      selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
-    };
-    reader.readAsDataURL(file);
+    formData.append("story_image", file);
   }
 
-  storyModal.style.display = "none";
+  // --- 3. Send Data to Backend ---
+  try {
+    const response = await fetch("/story/update", {
+      method: "POST",
+      body: formData // Note: Do NOT set Content-Type header when using FormData
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+
+      // --- 4. Success: Update UI Display ---
+      selectedStoryCard.querySelector(".story-title").textContent = titleValue;
+      selectedStoryCard.querySelector(".story-description").textContent = descValue;
+
+      // Update image preview using the local file (fast) or server path
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (loadEvent) {
+          selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      storyModal.style.display = "none";
+      alert("Story updated successfully!");
+    } else {
+      alert("Failed to save story on the server.");
+    }
+  } catch (error) {
+    console.error("Connection error:", error);
+    alert("Network error. Please check your connection and try again.");
+  }
 });
+
+
+
+// storyForm.addEventListener("submit", (event) => {
+//   event.preventDefault();
+
+//   if (!selectedStoryCard) {
+//     return;
+//   }
+
+//   const titleWords = storyTitleInput.value.trim().split(/\s+/).filter(Boolean).length;
+//   const descWords = storyDescriptionInput.value.trim().split(/\s+/).filter(Boolean).length;
+
+//   if (titleWords > 21) {
+//     alert("Title must be 21 words or less.");
+//     return; // Stops the execution
+//   }
+
+//   if (descWords > 1500) {
+//     alert("Description must be 1500 words or less.");
+//     return; // Stops the execution
+//   }
+
+//   selectedStoryCard.querySelector(".story-title").textContent = storyTitleInput.value;
+//   selectedStoryCard.querySelector(".story-description").textContent = storyDescriptionInput.value;
+
+//   const file = storyPicInput.files[0];
+//   if (file) {
+//     const reader = new FileReader();
+//     reader.onload = function (loadEvent) {
+//       selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
+//     };
+//     reader.readAsDataURL(file);
+//   }
+
+//   storyModal.style.display = "none";
+// });
 
 
 

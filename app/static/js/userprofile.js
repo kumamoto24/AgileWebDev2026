@@ -2,34 +2,44 @@
 
 function toggleLike(profileId) {
     const likeBtn = document.getElementById('likeBtn');
-    const isLiked = likeBtn.classList.toggle('active');
     
-    // Update text or icon visually
-    if (isLiked) {
-        likeBtn.innerHTML = '❤️ Liked';
-    } else {
-        likeBtn.innerHTML = '🤍 Like';
-    }
+    // 1. Optimistic UI update (change color immediately)
+    const isLiked = likeBtn.classList.toggle('active');
+    likeBtn.innerHTML = isLiked ? '❤️ Liked' : '🤍 Like';
 
-    // fetch(`/profile/${profileId}/like`, {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ liked: isLiked })
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     console.log('Success:', data);
-    // })
-    // .catch((error) => {
-    //     console.error('Error updating like:', error);
-    // });
-  }
+    // 2. Send the data
+    fetch(`/profile/${profileId}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // If using Flask, you might need the X-CSRFToken header here
+        },
+        body: JSON.stringify({ 
+            profile_id: profileId, // Explicitly tell the backend which ID
+            action: isLiked ? 'like' : 'unlike' 
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            // 3. Revert if the server fails
+            throw new Error('Server error');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Database updated:', data);
+    })
+    .catch((error) => {
+        // 4. Revert UI if error occurs
+        console.error('Error:', error);
+        likeBtn.classList.toggle('active');
+        likeBtn.innerHTML = !isLiked ? '❤️ Liked' : '🤍 Like';
+        alert("Couldn't save like. Please try again.");
+    });
+}
 
 
 
-// Story
 document.addEventListener("DOMContentLoaded", () => {
   const viewer = document.getElementById("storyViewer");
   const viewerImg = document.getElementById("viewerImg");
