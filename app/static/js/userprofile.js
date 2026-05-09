@@ -11,20 +11,20 @@ function toggleLike(profileId) {
         likeBtn.innerHTML = '🤍 Like';
     }
 
-    fetch(`/profile/${profileId}/like`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ liked: isLiked })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.error('Error updating like:', error);
-    });
+    // fetch(`/profile/${profileId}/like`, {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ liked: isLiked })
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     console.log('Success:', data);
+    // })
+    // .catch((error) => {
+    //     console.error('Error updating like:', error);
+    // });
   }
 
 
