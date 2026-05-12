@@ -236,13 +236,13 @@ def signup():
         # We create a blank profile so the 'myprofile' page has data to find
         new_profile = Profile(
             user_id=new_user.id,
-            display_name="New Member", # Placeholder name
-            age=18,                   # Required field default
-            gender="Not Specified",    # For recommendation algorithm
-            orientation="Not Specified",
-            location_text="Unknown",
-            latitude=0.0,
-            longitude=0.0,
+            display_name="", # Placeholder name
+            age="",                   # Required field default
+            gender="",    # For recommendation algorithm
+            orientation="",
+            location_text="",
+            latitude="",
+            longitude="",
             place_id="default"
         )
         db.session.add(new_profile)
@@ -346,10 +346,6 @@ def search_profiles():
     search_longitude = request.args.get("longitude", type=float)
     radius_km = request.args.get("radius_km", default=10, type=float)
 
-    '''
-    # Temporary: use the first profile in the database as the current user.
-    current_profile = Profile.query.order_by(Profile.id.asc()).first()
-    '''
     if "user_id" not in session:
         return redirect(url_for("index"))
 
@@ -422,23 +418,22 @@ def search_profiles():
 
 
 
-@app.route("/profile/<int:user_id>", methods=["GET", "POST"])
-def profile(user_id):
-    # 1. SECURITY: Ensure the logged-in user can only edit their own profile
-    if "user_id" not in session or session['user_id'] != user_id:
-        return redirect(url_for("index"))
-
-    # 2. SEARCH: Find the user's profile
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    # Ensure user is logged in
+    if "user_id" not in session:
+        return redirect(url_for("signup"))
+    
+    user_id = session['user_id']
     user_profile = Profile.query.filter_by(user_id=user_id).first()
 
-    # 3. HANDLE POST (Saving data)
+    # HANDLE SAVING DATA (POST)
     if request.method == "POST":
-        # If no profile exists, create it now to satisfy NOT NULL constraints
         if not user_profile:
             user_profile = Profile(user_id=user_id)
             db.session.add(user_profile)
 
-        # Assign values from the form
+        # Update fields
         user_profile.display_name = request.form.get("name")
         user_profile.bio = request.form.get("bio")
         user_profile.gender = request.form.get("gender")
@@ -453,51 +448,32 @@ def profile(user_id):
                 user_profile.interests.append(interest_obj)
 
         db.session.commit()
-        # Redirect back to the dynamic URL
-        return redirect(url_for('profile', user_id=user_id))
+        # Stay on the same page after saving
+        return redirect(url_for('profile'))
     
-    # 4. HANDLE GET (Displaying data)
+    # HANDLE DISPLAYING DATA (GET)
     all_interests = Interest.query.all()
-    
     return render_template(
         "myprofile.html",
         interests_list=all_interests,
         user=user_profile, 
-        google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
 
-# @app.route("/profile", methods=["GET", "POST"])
-# def profile():
-#     if "user_id" not in session:
-#         return redirect(url_for("index"))
-    
-#     user_id = session['user_id']
-#     user_profile = Profile.query.filter_by(user_id=user_id).first()
-
-#     if request.method == "POST":
-#         if not user_profile:
-#             user_profile = Profile(user_id=user_id)
-#             db.session.add(user_profile)
-        
-#         # Fill data from form
-#         user_profile.display_name = request.form.get("name")
-#         user_profile.bio = request.form.get("bio")
-#         # ... rest of your save logic ...
-
-#         db.session.commit()
-#         # After saving, send them to their PUBLIC view
-#         return redirect(url_for('profile_detail', profile_id=user_id))
-
-#     return render_template("myprofile.html", user=user_profile, interests_list=Interest.query.all())
-
 
 @app.route("/profile/<int:profile_id>")
-def profile_detail(profile_id):
+def profile_detail(user_id):
+    # If the user is looking at their own ID, send them to the edit page instead
+    if "user_id" in session and session['user_id'] == user_id:
+        return redirect(url_for("profile"))
+
+    target_profile = Profile.query.filter_by(user_id=user_id).first_or_404()
     return render_template(
         "userprofile.html",
-        profile_id=profile_id
+        profile=target_profile,
+        is_logged_in="user_id" in session
     )
+
 
 @app.route("/profile/<int:profile_id>/like", methods=["POST"])
 def handle_like(profile_id):
@@ -508,14 +484,11 @@ def handle_like(profile_id):
     return jsonify({"status": "success"}), 200
 
 
-@app.route("/profile/update", methods=["POST"])
-def update_profile():
-    User.name = request.form.get("name")
-    db.session.commit()
-    return redirect(url_for('profile'))
-    # data = request.get_json()
-
-    # return jsonify({"status": "success", "message": "Profile updated"}), 200
+# @app.route("/profile/update", methods=["POST"])
+# def update_profile():
+#     User.name = request.form.get("name")
+#     db.session.commit()
+#     return redirect(url_for('profile'))
 
 
 @app.route("/story/update", methods=["POST"])
