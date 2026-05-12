@@ -142,65 +142,6 @@
           <button type="submit" class="btn btn-success">Save</button>
         </form>
       </div>
-      <!-- <div id="profileModal" class="profile-modal">
-        <form id="profileForm" class="profile-popup" action="/profile/update" method="POST" >
-          <button
-            id="closeProfile"
-            class="close"
-            type="button"
-            aria-label="Close profile form"
-          >
-            &times;
-          </button>
-
-          <h1>Edit Profile</h1>
-
-          <label for="nameInput">Name:</label>
-          <input type="text" id="nameInput" name="display_name" value="Jane Doe">
-
-          <label for="ageInput">Age:</label>
-          <input type="number" id="ageInput" name="age" value="24">
-
-          <label for="locationInput">Location:</label>
-          <input id="locationInput" name="location_text" type="text" value="Perth WA, Australia">
-          <input id="locationPlaceId" name="place_id" type="hidden">
-          
-          <label>Interests:</label>
-          <div class="interests-container">
-            {% for interest in interests_list %}
-            <div class="interest-item">
-                <input type="checkbox" 
-                      class="interest-checkbox" 
-                      name="interest" 
-                      value="{{ interest.name }}" 
-                      id="int{{ interest.id }}"
-                      {% if interest in user.interests %}checked{% endif %}>
-                <label for="int{{ interest.id }}">{{ interest.name }}</label>
-            </div>
-            {% endfor %}
-          </div>
-
-          <label for="genderInput">Gender:</label>
-          <select id="genderInput" name="gender">
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-          </select>
-
-          <label for="orientationInput">Sexual Orientation:</label>
-          <select id="orientationInput" name="orientation">
-              <option value="Straight">Straight</option>
-              <option value="Gay">Gay</option>
-              <option value="Lesbian">Lesbian</option>
-              <option value="Other">Other</option>
-          </select>
-
-          <label for="bioInput">Bio:</label>
-          <textarea id="bioInput" name="bio">I love coffee, music, traveling, and meeting new people.</textarea>
-          <button type="submit" class="btn btn-success">Save</button>
-        </form>
-      </div> -->
-
     </section>
 
     <section class="story-section container">
