@@ -29,19 +29,19 @@ DEMO_PROFILES = [
         "latitude": -31.9523,
         "longitude": 115.8613,
         "place_id": "demo_place_perth_1",
-        "profile_image_path": "uploads/demo/alice-profile.jpg",
+        "profile_image_path": "uploads/profile_images/alice-profile.jpg",
         "interests": ["Music", "Travel", "Cooking"],
         "stories": [
             {
                 "title": "Weekend Cafe",
                 "description": "Trying a new cafe in Perth.",
-                "image_path": "uploads/demo/alice-story-1.jpg",
+                "image_path": "uploads/profile_images/alice-story-1.jpg",
                 "display_order": 1
             },
             {
                 "title": "Beach Walk",
                 "description": "Enjoying the sunset near Cottesloe.",
-                "image_path": "uploads/demo/alice-story-2.jpg",
+                "image_path": "uploads/profile_images/alice-story-2.jpg",
                 "display_order": 2
             }
         ]
@@ -58,19 +58,19 @@ DEMO_PROFILES = [
         "latitude": -31.9812,
         "longitude": 115.8199,
         "place_id": "demo_place_uwa_1",
-        "profile_image_path": "uploads/demo/ben-profile.jpg",
+        "profile_image_path": "uploads/profile_images/ben-profile.jpg",
         "interests": ["Fitness", "Movies", "Sports"],
         "stories": [
             {
                 "title": "Gym Day",
                 "description": "Morning workout before class.",
-                "image_path": "uploads/demo/ben-story-1.jpg",
+                "image_path": "uploads/profile_images/ben-story-1.jpg",
                 "display_order": 1
             },
             {
                 "title": "Movie Night",
                 "description": "Watching a new film with friends.",
-                "image_path": "uploads/demo/ben-story-2.jpg",
+                "image_path": "uploads/profile_images/ben-story-2.jpg",
                 "display_order": 2
             }
         ]
@@ -87,13 +87,13 @@ DEMO_PROFILES = [
         "latitude": -32.0569,
         "longitude": 115.7439,
         "place_id": "demo_place_fremantle_1",
-        "profile_image_path": "uploads/demo/chloe-profile.jpg",
+        "profile_image_path": "uploads/profile_images/chloe-profile.jpg",
         "interests": ["Art", "Gaming", "Technology"],
         "stories": [
             {
                 "title": "Art Gallery",
                 "description": "Visited a local art exhibition.",
-                "image_path": "uploads/demo/chloe-story-1.jpg",
+                "image_path": "uploads/profile_images/chloe-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -116,7 +116,7 @@ DEMO_PROFILES = [
             {
                 "title": "Bookstore Visit",
                 "description": "Spent the afternoon browsing new books.",
-                "image_path": "uploads/demo/mia-story-1.jpg",
+                "image_path": "uploads/profile_images/mia-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -139,7 +139,7 @@ DEMO_PROFILES = [
             {
                 "title": "Morning Run",
                 "description": "Running near the lake before work.",
-                "image_path": "uploads/demo/ethan-story-1.jpg",
+                "image_path": "uploads/profile_images/ethan-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -162,7 +162,7 @@ DEMO_PROFILES = [
             {
                 "title": "Cinema Night",
                 "description": "Watched a new film in the city.",
-                "image_path": "uploads/demo/olivia-story-1.jpg",
+                "image_path": "uploads/profile_images/olivia-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -185,7 +185,7 @@ DEMO_PROFILES = [
             {
                 "title": "Gallery Weekend",
                 "description": "Visited a small art gallery in Melbourne.",
-                "image_path": "uploads/demo/noah-story-1.jpg",
+                "image_path": "uploads/profile_images/noah-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -208,7 +208,7 @@ DEMO_PROFILES = [
             {
                 "title": "Home Cooking",
                 "description": "Trying a new recipe on Sunday.",
-                "image_path": "uploads/demo/sophie-story-1.jpg",
+                "image_path": "uploads/profile_images/sophie-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -231,7 +231,7 @@ DEMO_PROFILES = [
             {
                 "title": "Game Night",
                 "description": "Playing games with friends online.",
-                "image_path": "uploads/demo/liam-story-1.jpg",
+                "image_path": "uploads/profile_images/liam-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -254,7 +254,7 @@ DEMO_PROFILES = [
             {
                 "title": "Harbour Walk",
                 "description": "A quiet walk near the waterfront.",
-                "image_path": "uploads/demo/grace-story-1.jpg",
+                "image_path": "uploads/profile_images/grace-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -277,7 +277,7 @@ DEMO_PROFILES = [
             {
                 "title": "Outdoor Training",
                 "description": "Training outside before sunset.",
-                "image_path": "uploads/demo/jack-story-1.jpg",
+                "image_path": "uploads/profile_images/jack-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -300,7 +300,7 @@ DEMO_PROFILES = [
             {
                 "title": "Study Session",
                 "description": "Reading and coding at a local library.",
-                "image_path": "uploads/demo/ava-story-1.jpg",
+                "image_path": "uploads/profile_images/ava-story-1.jpg",
                 "display_order": 1
             }
         ]
@@ -323,7 +323,7 @@ DEMO_PROFILES = [
             {
                 "title": "Beach Day",
                 "description": "Spending the afternoon near the beach.",
-                "image_path": "uploads/demo/lucas-story-1.jpg",
+                "image_path": "uploads/profile_images/lucas-story-1.jpg",
                 "display_order": 1
             }
         ]

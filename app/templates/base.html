@@ -28,7 +28,7 @@
   <link 
     rel="icon" 
     type="image/png" 
-    href="{{ url_for('static', filename='logo.png') }}"
+    href="{{ url_for('static', filename='images/logo.png') }}"
   >
 
   {% block extra_head %}{% endblock %}
@@ -109,7 +109,18 @@
 
     </div>
   </nav>
-
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
   <!-- Page Content -->
   {% block content %}{% endblock %}
 

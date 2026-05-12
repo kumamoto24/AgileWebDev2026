@@ -79,7 +79,7 @@ function displayProfiles(profiles) {
             <h5 class="card-title">${profile.name}, ${profile.age}</h5>
             <p class="card-text text-muted">${profile.location} ${distanceText} </p>
 
-            <div class="mb-3">
+            <div class="mb-3 profile-card-interests">
                 ${(profile.interests || []).map(interest => `
                 <span class="tag">${interest}</span>
                 `).join("")}

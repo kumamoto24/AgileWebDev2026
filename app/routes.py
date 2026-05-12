@@ -1,13 +1,15 @@
 from flask import flash, render_template, jsonify, request, redirect, url_for, current_app, session
-from app import app
+
+from app import app, db
 import os
-#Database acess
-from app import db
+
 
 from sqlalchemy import or_
 from app.models import Profile, Interest, User
 
 from math import radians, sin, cos, sqrt, atan2
+
+from flask_login import login_user, login_required, current_user, logout_user
 from functools import wraps
 
 #Helper function: Load image
@@ -15,8 +17,20 @@ def build_profile_image_url(image_path):
     if not image_path:
         return url_for("static", filename="images/default-profile.png")
 
-    if image_path.startswith(("http://", "https://", "/static/")):
+    if image_path.startswith(("http://", "https://")):
         return image_path
+    
+    # Handle situation where file does not exist in filesystem
+    static_prefix = "/static/"
+    if image_path.startswith(static_prefix):
+        filename = image_path[len(static_prefix):]  
+    else:
+        filename = image_path
+
+    full_path = os.path.join(current_app.static_folder, filename)
+
+    if not os.path.exists(full_path):
+        return url_for("static", filename="images/default-profile.png")
 
     return url_for("static", filename=image_path)
 
@@ -54,36 +68,6 @@ def calculate_distance_km(lat1, lon1, lat2, lon2):
 
     return round(earth_radius_km * c, 1)
 
-#Some sample profile cards to show how the webpage looks like
-sample_profiles = [
-    {
-        "id": 1,
-        "name": "Alice",
-        "age": 21,
-        "location": "Perth",
-        "interests": ["Music", "Travel", "Coffee"],
-        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop",
-        "distance": 2.5,
-    },
-    {
-        "id": 2,
-        "name": "Ben",
-        "age": 23,
-        "location": "Sydney",
-        "interests": ["Gaming", "Movies", "Food"],
-        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=300&fit=crop",
-        "distance": 6.8,
-    },
-    {
-        "id": 3,
-        "name": "Cathy",
-        "age": 22,
-        "location": "Melbourne",
-        "interests": ["Art", "Photography", "Reading"],
-        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop",
-        "distance": 10.2,
-    },
-]
 # Interest list (global)
 all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
 
@@ -170,13 +154,27 @@ def profile_required(view_func):
 
     return wrapped_view
  
+# Helper function: get feature profiles
+def get_feature_profile():
+    featured_profiles = (
+        Profile.query
+        .order_by(db.func.random())
+        .limit(3)
+        .all())
+    return [profile_to_card(profile) for profile in featured_profiles]
+
+
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html", is_logged_in=False,profiles=sample_profiles)
+    return render_template(
+        "index.html", 
+        is_logged_in=False,
+        profiles= get_feature_profile())
 
 
 @app.route("/home")
+@login_required
 @profile_required
 def home():
 
@@ -184,12 +182,12 @@ def home():
     # Temporary: use the first profile as the current user profile
     current_profile = Profile.query.first()
     '''
-    # Give back the login session
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    #Replaced with @login_required and flask-login session management
+    # # Give back the login session
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
-    current_profile = current_user.profile if current_user else None
+    current_profile = current_user.profile
 
     username = (
         current_profile.display_name
@@ -279,6 +277,7 @@ def signup():
 
 
 @app.route("/api/recommended-profiles")
+@login_required
 @profile_required
 def recommended_profiles():
     '''
@@ -286,11 +285,11 @@ def recommended_profiles():
     current_profile = Profile.query.first()
     '''
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
-    current_profile = current_user.profile if current_user else None
+    if not current_user.is_authenticated:
+        return jsonify([])
+    
+    current_profile = current_user.profile
 
     if not current_profile:
         return jsonify([])
@@ -351,6 +350,7 @@ def recommended_profiles():
 
 
 @app.route("/api/search-profiles", methods=["GET"])
+@login_required
 @profile_required
 def search_profiles():
     keyword = request.args.get("keyword", "").strip()
@@ -369,12 +369,11 @@ def search_profiles():
     # Temporary: use the first profile in the database as the current user.
     current_profile = Profile.query.order_by(Profile.id.asc()).first()
     '''
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
-    current_profile = current_user.profile if current_user else None
-    
+    current_profile = current_user.profile
+
     if current_profile is None:
         return jsonify({
             "profiles": []
@@ -445,8 +444,9 @@ def search_profiles():
 
 
 @app.route("/profile", methods=["GET", "POST"])
+@login_required
 def profile():
-    # 1. SECURITY: Ensure the logged-in user can only edit their own profile
+
     if "user_id" not in session:
         return redirect(url_for("index"))
 
@@ -576,24 +576,25 @@ def update_story():
 
 # '/matches' to be deleted
 @app.route("/matches")
+@login_required
 @profile_required
 def matches():
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
     return "Matches page placeholder"
 
 
 @app.route("/messages", methods=["GET", "POST"])
+@login_required
 @profile_required
 def messages():
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
-    current_profile = current_user.profile if current_user else None
+    current_profile = current_user.profile
 
     contacts = []
 
@@ -646,10 +647,12 @@ def login():
                 show_login_modal=True,
                 login_error="Invalid email or password."
             )
+        
+        remember = request.form.get("remember") == "on"
+
 
         #Create session
-        session["user_id"] = user.id
-        session["email"] = user.email
+        login_user(user, remember=remember)
 
         #Redirect after login
         return redirect(url_for("home"))
@@ -657,12 +660,12 @@ def login():
     return render_template(
         "index.html",
         is_logged_in=False,
-        profiles=sample_profiles,
+        profiles=get_feature_profile(),
         show_login_modal=True
     )
 
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for("index"))
