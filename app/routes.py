@@ -65,36 +65,6 @@ def calculate_distance_km(lat1, lon1, lat2, lon2):
 
     return round(earth_radius_km * c, 1)
 
-#Some sample profile cards to show how the webpage looks like
-sample_profiles = [
-    {
-        "id": 1,
-        "name": "Alice",
-        "age": 21,
-        "location": "Perth",
-        "interests": ["Music", "Travel", "Coffee"],
-        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop",
-        "distance": 2.5,
-    },
-    {
-        "id": 2,
-        "name": "Ben",
-        "age": 23,
-        "location": "Sydney",
-        "interests": ["Gaming", "Movies", "Food"],
-        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=300&fit=crop",
-        "distance": 6.8,
-    },
-    {
-        "id": 3,
-        "name": "Cathy",
-        "age": 22,
-        "location": "Melbourne",
-        "interests": ["Art", "Photography", "Reading"],
-        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop",
-        "distance": 10.2,
-    },
-]
 # Interest list (global)
 all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
 
