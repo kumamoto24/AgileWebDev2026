@@ -92,27 +92,33 @@ def compatible(current_profile, candidate):
     current_orientation = current_profile.orientation.lower()
 
     candidate_gender = candidate.gender.lower()
+    candidate_orientation = candidate.orientation.lower()
 
     if current_orientation == "straight":
         if current_gender == "male":
-            return candidate_gender == "female"
+            return candidate_gender == "female" and candidate_orientation == "straight"
         if current_gender == "female":
-            return candidate_gender == "male"
+            return candidate_gender == "male" and candidate_orientation == "straight"
         return True
 
+    # Based on same sexual-orientation
     if current_orientation == "gay":
-        return current_gender == candidate_gender
+        return candidate_orientation == "gay"
 
     if current_orientation == "lesbian":
-        return current_gender == "female" and candidate_gender == "female"
+        return candidate_orientation == "lesbian"
 
     # For "other", keep the filter open for now
     return True
 
 # Helper function: Calculate match score
 def calculate_match_score(shared_interest_count, distance, candidate):
+    # The total score would be 100
+
+    # Shared interest score: max 30
     interest_score = min(shared_interest_count * 10, 30)
 
+    # Calculate the distance score: max 60
     if distance is None:
         distance_score = 0
     elif distance <= 5:
@@ -130,6 +136,7 @@ def calculate_match_score(shared_interest_count, distance, candidate):
     else:
         distance_score = 0
 
+    # The profile completeness score: max 10
     completeness_score = 0
 
     if candidate.bio:
@@ -151,8 +158,17 @@ def index():
 
 @app.route("/home")
 def home():
+
+    '''
     # Temporary: use the first profile as the current user profile
     current_profile = Profile.query.first()
+    '''
+    # Give back the login session
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
+    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile if current_user else None
 
     username = (
         current_profile.display_name
@@ -230,8 +246,16 @@ def signup():
 
 @app.route("/api/recommended-profiles")
 def recommended_profiles():
+    '''
     # Temporary: use the first profile as the current user profile (login has not been developed)
     current_profile = Profile.query.first()
+    '''
+
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+
+    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile if current_user else None
 
     if not current_profile:
         return jsonify([])
@@ -302,9 +326,16 @@ def search_profiles():
     search_longitude = request.args.get("longitude", type=float)
     radius_km = request.args.get("radius_km", default=10, type=float)
 
+    '''
     # Temporary: use the first profile in the database as the current user.
     current_profile = Profile.query.order_by(Profile.id.asc()).first()
+    '''
+    if "user_id" not in session:
+        return redirect(url_for("index"))
 
+    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile if current_user else None
+    
     if current_profile is None:
         return jsonify({
             "profiles": []
