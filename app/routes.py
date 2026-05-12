@@ -456,7 +456,8 @@ def profile():
     return render_template(
         "myprofile.html",
         interests_list=all_interests,
-        user=user_profile, 
+        user=user_profile,
+        google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
 
@@ -482,13 +483,6 @@ def handle_like(profile_id):
     data = request.get_json()
     print(f"Received {data.get('action')} for profile {profile_id}")
     return jsonify({"status": "success"}), 200
-
-
-# @app.route("/profile/update", methods=["POST"])
-# def update_profile():
-#     User.name = request.form.get("name")
-#     db.session.commit()
-#     return redirect(url_for('profile'))
 
 
 @app.route("/story/update", methods=["POST"])
