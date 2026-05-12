@@ -1,4 +1,4 @@
-from flask import flash, render_template, jsonify, request, redirect, url_for, current_app, session
+from flask import flash, render_template, jsonify, request, redirect, url_for, current_app
 
 from app import app, db
 import os
@@ -140,11 +140,10 @@ def calculate_match_score(shared_interest_count, distance, candidate):
 def profile_required(view_func):
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
-        if "user_id" not in session:
-            return redirect(url_for("index"))
+        if not current_user.is_authenticated:
+            return redirect(url_for("login"))
 
-        user = User.query.get(session["user_id"])
-        profile = user.profile if user else None
+        profile = current_user.profile
 
         if not profile or not profile.is_complete:
             flash("Please complete your profile first.")
@@ -177,15 +176,6 @@ def index():
 @login_required
 @profile_required
 def home():
-
-    '''
-    # Temporary: use the first profile as the current user profile
-    current_profile = Profile.query.first()
-    '''
-    #Replaced with @login_required and flask-login session management
-    # # Give back the login session
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
 
     current_profile = current_user.profile
 
@@ -263,8 +253,8 @@ def signup():
         db.session.commit()
 
         # 3. AUTO-LOGIN
-        # Store the ID in session so they are 'logged in' immediately
-        session["user_id"] = new_user.id
+        # Let Flask-Login manage the login session.
+        login_user(new_user)
 
         # 4. REDIRECT TO PROFILE
         # Direct them to fill out their bio and interests
@@ -365,13 +355,6 @@ def search_profiles():
     search_longitude = request.args.get("longitude", type=float)
     radius_km = request.args.get("radius_km", default=10, type=float)
 
-    '''
-    # Temporary: use the first profile in the database as the current user.
-    current_profile = Profile.query.order_by(Profile.id.asc()).first()
-    '''
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
-
     current_profile = current_user.profile
 
     if current_profile is None:
@@ -447,19 +430,14 @@ def search_profiles():
 @login_required
 def profile():
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
-
-    user_id = session["user_id"]
-
     # 2. SEARCH: Find the user's profile
-    user_profile = Profile.query.filter_by(user_id=user_id).first()
+    user_profile = current_user.profile
 
     # 3. HANDLE POST (Saving data)
     if request.method == "POST":
         # If no profile exists, create it now to satisfy NOT NULL constraints
         if not user_profile:
-            user_profile = Profile(user_id=user_id)
+            user_profile = Profile(user_id=current_user.id)
             db.session.add(user_profile)
 
         # Assign values from the form
@@ -496,31 +474,6 @@ def profile():
         is_logged_in=True
     )
 
-# @app.route("/profile", methods=["GET", "POST"])
-# def profile():
-#     if "user_id" not in session:
-#         return redirect(url_for("index"))
-    
-#     user_id = session['user_id']
-#     user_profile = Profile.query.filter_by(user_id=user_id).first()
-
-#     if request.method == "POST":
-#         if not user_profile:
-#             user_profile = Profile(user_id=user_id)
-#             db.session.add(user_profile)
-        
-#         # Fill data from form
-#         user_profile.display_name = request.form.get("name")
-#         user_profile.bio = request.form.get("bio")
-#         # ... rest of your save logic ...
-
-#         db.session.commit()
-#         # After saving, send them to their PUBLIC view
-#         return redirect(url_for('profile_detail', profile_id=user_id))
-
-#     return render_template("myprofile.html", user=user_profile, interests_list=Interest.query.all())
-
-
 @app.route("/profile/<int:profile_id>")
 def profile_detail(profile_id):
     return render_template(
@@ -538,17 +491,11 @@ def handle_like(profile_id):
 
 
 @app.route("/profile/update", methods=["POST"])
+@login_required
 def update_profile():
-    if "user_id" not in session:
-        return redirect(url_for("index"))
-
-    user = User.query.get(session["user_id"])
-    if not user:
-        return redirect(url_for("index"))
-
-    profile = user.profile
+    profile = current_user.profile
     if not profile:
-        profile = Profile(user_id=user.id)
+        profile = Profile(user_id=current_user.id)
         db.session.add(profile)
 
     profile.display_name = request.form.get("display_name")
@@ -560,6 +507,13 @@ def update_profile():
     profile.longitude = request.form.get("longitude", type=float)
     profile.place_id = request.form.get("place_id")
     profile.bio = request.form.get("bio")
+
+    submitted_interests = request.form.getlist("interest")
+    profile.interests = []
+    for name in submitted_interests:
+        interest_obj = Interest.query.filter_by(name=name).first()
+        if interest_obj:
+            profile.interests.append(interest_obj)
 
     db.session.commit()
     return redirect(url_for("profile"))
@@ -579,10 +533,6 @@ def update_story():
 @login_required
 @profile_required
 def matches():
-
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
-
     return "Matches page placeholder"
 
 
@@ -590,10 +540,6 @@ def matches():
 @login_required
 @profile_required
 def messages():
-
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
-
     current_profile = current_user.profile
 
     contacts = []
@@ -651,7 +597,7 @@ def login():
         remember = request.form.get("remember") == "on"
 
 
-        #Create session
+        # Create Flask-Login session
         login_user(user, remember=remember)
 
         #Redirect after login
