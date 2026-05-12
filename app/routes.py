@@ -187,20 +187,19 @@ def home():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-
     if request.method == "POST":
-
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
         confirm_password = request.form.get("confirm_password", "").strip()
 
-        #Check required fields
+        # Check required fields
         if not email or not password or not confirm_password:
             return render_template(
                 "signup.html",
                 is_logged_in=False,
                 signup_error="Please complete all required fields."
             )
+            
         # Password length validation
         if len(password) < 8 or len(password) > 64:
             return render_template(
@@ -208,7 +207,8 @@ def signup():
                 is_logged_in=False,
                 signup_error="Password must be between 8 and 64 characters."
             )
-        #Check passwords match
+
+        # Check passwords match
         if password != confirm_password:
             return render_template(
                 "signup.html",
@@ -216,9 +216,8 @@ def signup():
                 signup_error="Passwords do not match."
             )
 
-        #Check duplicate email
+        # Check duplicate email
         existing_user = User.query.filter_by(email=email).first()
-
         if existing_user:
             return render_template(
                 "signup.html",
@@ -226,23 +225,44 @@ def signup():
                 signup_error="Email already registered."
             )
 
-        #Create new user
+        # 1. Create and Save the User
         new_user = User(email=email)
-
-        #Hash password
         new_user.set_password(password)
-
-        #Save to database
         db.session.add(new_user)
+        # Use flush to get the new_user.id before the final commit
+        db.session.flush() 
+
+        # 2. AUTOMATIC PROFILE CREATION
+        # We create a blank profile so the 'myprofile' page has data to find
+        new_profile = Profile(
+            user_id=new_user.id,
+            display_name="New Member", # Placeholder name
+            age=18,                   # Required field default
+            gender="Not Specified",    # For recommendation algorithm
+            orientation="Not Specified",
+            location_text="Unknown",
+            latitude=0.0,
+            longitude=0.0,
+            place_id="default"
+        )
+        db.session.add(new_profile)
+        
+        # Finalize both User and Profile in the database
         db.session.commit()
 
-        #Redirect after successful signup
-        return redirect(url_for("login"))
+        # 3. AUTO-LOGIN
+        # Store the ID in session so they are 'logged in' immediately
+        session["user_id"] = new_user.id
+
+        # 4. REDIRECT TO PROFILE
+        # Direct them to fill out their bio and interests
+        return redirect(url_for("profile"))
 
     return render_template(
         "signup.html",
         is_logged_in=False
     )
+
 
 @app.route("/api/recommended-profiles")
 def recommended_profiles():
@@ -401,41 +421,75 @@ def search_profiles():
     return jsonify(results)
 
 
-@app.route("/profile", methods=["GET", "POST"])
-def profile():
 
-    if "user_id" not in session:
+@app.route("/profile/<int:user_id>", methods=["GET", "POST"])
+def profile(user_id):
+    # 1. SECURITY: Ensure the logged-in user can only edit their own profile
+    if "user_id" not in session or session['user_id'] != user_id:
         return redirect(url_for("index"))
 
-    
+    # 2. SEARCH: Find the user's profile
+    user_profile = Profile.query.filter_by(user_id=user_id).first()
+
+    # 3. HANDLE POST (Saving data)
     if request.method == "POST":
-        # Get data from form
-        submitted_name = request.form.get("name")
-        submitted_interests = request.form.getlist("interest") # 'interest' matches the 'name' attribute in HTML
+        # If no profile exists, create it now to satisfy NOT NULL constraints
+        if not user_profile:
+            user_profile = Profile(user_id=user_id)
+            db.session.add(user_profile)
+
+        # Assign values from the form
+        user_profile.display_name = request.form.get("name")
+        user_profile.bio = request.form.get("bio")
+        user_profile.gender = request.form.get("gender")
+        user_profile.orientation = request.form.get("orientation")
         
-        # Validation
-        if not submitted_name:
-            return "Name is required", 400
-            
-        # Security check: Ensure interest is in our master list
-        for item in submitted_interests:
-            if item not in all_interests:
-                return f"Invalid interest: {item}", 400
-        
-        # If valid, save to database/logic here
-        return redirect(url_for('profile'))
+        # Handle interests
+        submitted_interests = request.form.getlist("interest")
+        user_profile.interests = [] 
+        for name in submitted_interests:
+            interest_obj = Interest.query.filter_by(name=name).first()
+            if interest_obj:
+                user_profile.interests.append(interest_obj)
+
+        db.session.commit()
+        # Redirect back to the dynamic URL
+        return redirect(url_for('profile', user_id=user_id))
     
-    user_data = {
-        "name": "Jane Doe",
-        "interests": ["Music", "Coffee"] # These are the ones already checked
-    }
+    # 4. HANDLE GET (Displaying data)
+    all_interests = Interest.query.all()
+    
     return render_template(
         "myprofile.html",
         interests_list=all_interests,
-        user=user_data,
+        user=user_profile, 
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
+
+# @app.route("/profile", methods=["GET", "POST"])
+# def profile():
+#     if "user_id" not in session:
+#         return redirect(url_for("index"))
+    
+#     user_id = session['user_id']
+#     user_profile = Profile.query.filter_by(user_id=user_id).first()
+
+#     if request.method == "POST":
+#         if not user_profile:
+#             user_profile = Profile(user_id=user_id)
+#             db.session.add(user_profile)
+        
+#         # Fill data from form
+#         user_profile.display_name = request.form.get("name")
+#         user_profile.bio = request.form.get("bio")
+#         # ... rest of your save logic ...
+
+#         db.session.commit()
+#         # After saving, send them to their PUBLIC view
+#         return redirect(url_for('profile_detail', profile_id=user_id))
+
+#     return render_template("myprofile.html", user=user_profile, interests_list=Interest.query.all())
 
 
 @app.route("/profile/<int:profile_id>")
@@ -456,9 +510,12 @@ def handle_like(profile_id):
 
 @app.route("/profile/update", methods=["POST"])
 def update_profile():
-    data = request.get_json()
+    User.name = request.form.get("name")
+    db.session.commit()
+    return redirect(url_for('profile'))
+    # data = request.get_json()
 
-    return jsonify({"status": "success", "message": "Profile updated"}), 200
+    # return jsonify({"status": "success", "message": "Profile updated"}), 200
 
 
 @app.route("/story/update", methods=["POST"])
