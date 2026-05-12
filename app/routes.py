@@ -160,15 +160,17 @@ def index():
 
 
 @app.route("/home")
+@login_required
 def home():
 
     '''
     # Temporary: use the first profile as the current user profile
     current_profile = Profile.query.first()
     '''
-    # Give back the login session
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    #Replaced with @login_required and flask-login session management
+    # # Give back the login session
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
     current_user = User.query.get(session["user_id"])
     current_profile = current_user.profile if current_user else None
@@ -248,14 +250,15 @@ def signup():
     )
 
 @app.route("/api/recommended-profiles")
+@login_required
 def recommended_profiles():
     '''
     # Temporary: use the first profile as the current user profile (login has not been developed)
     current_profile = Profile.query.first()
     '''
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
     current_user = User.query.get(session["user_id"])
     current_profile = current_user.profile if current_user else None
@@ -316,6 +319,7 @@ def recommended_profiles():
 
 
 @app.route("/api/search-profiles", methods=["GET"])
+@login_required
 def search_profiles():
     keyword = request.args.get("keyword", "").strip()
 
@@ -333,8 +337,8 @@ def search_profiles():
     # Temporary: use the first profile in the database as the current user.
     current_profile = Profile.query.order_by(Profile.id.asc()).first()
     '''
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
     current_user = User.query.get(session["user_id"])
     current_profile = current_user.profile if current_user else None
@@ -405,10 +409,11 @@ def search_profiles():
 
 
 @app.route("/profile", methods=["GET", "POST"])
+@login_required
 def profile():
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
     
     if request.method == "POST":
@@ -475,19 +480,21 @@ def update_story():
 
 # '/matches' to be deleted
 @app.route("/matches")
+@login_required
 def matches():
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
     return "Matches page placeholder"
 
 
 @app.route("/messages", methods=["GET", "POST"])
+@login_required
 def messages():
 
-    if "user_id" not in session:
-        return redirect(url_for("index"))
+    # if "user_id" not in session:
+    #     return redirect(url_for("index"))
 
     current_user = User.query.get(session["user_id"])
     current_profile = current_user.profile if current_user else None
