@@ -214,3 +214,8 @@ __marimo__/
 
 #database
 app.db
+
+
+# Ignore uploaded user files
+app/static/uploads/*
+!app/static/uploads/README.md

@@ -9,7 +9,7 @@
 
 .hero-section {
   height: 100vh;
-  background-image: url("https://henrydelacweddings.com/wp-content/uploads/2022/01/japan-cherry-blossom-engagement-photo-henry-delac-weddings-10.jpg");
+  background-image: url("../images/hero.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -159,11 +159,50 @@ h5 {
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
 .profilecard-custom {
   background-color: white;
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.profilecard-custom .card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.profilecard-custom .card-title {
+  min-height: 1.5em;
+}
+
+.profilecard-custom .card-text {
+  min-height: 1.5em;
+  overflow: hidden;
+}
+
+.profilecard-custom .profile-card-interests {
+  max-height: 70px;
+  overflow: hidden;
+}
+
+.profilecard-custom .btn {
+  margin-top: auto;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #f3c6d8;
+  color: #7b2c4d;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 
 /* Profile image */
@@ -171,6 +210,7 @@ h5 {
   width: 250px;
   height: 250px; /* fixed height */
   object-fit: cover; /* crop instead of stretch */
+  border-radius: 50%;
 }
 
 /* Following is for the login and sign-up features */
