@@ -9,6 +9,9 @@ from app.models import Profile, Interest, User
 
 from math import radians, sin, cos, sqrt, atan2
 
+from flask_login import login_user
+from flask_login import logout_user
+
 #Helper function: Load image
 def build_profile_image_url(image_path):
     if not image_path:
@@ -542,8 +545,7 @@ def login():
             )
 
         #Create session
-        session["user_id"] = user.id
-        session["email"] = user.email
+        login_user(user)
 
         #Redirect after login
         return redirect(url_for("home"))
@@ -558,5 +560,5 @@ def login():
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for("index"))
