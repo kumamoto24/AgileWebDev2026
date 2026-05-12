@@ -454,9 +454,31 @@ def messages():
 
     if "user_id" not in session:
         return redirect(url_for("index"))
-    
 
-    return "Messages page placeholder"
+    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile if current_user else None
+
+    contacts = []
+
+    if current_profile:
+        candidate_profiles = (
+            Profile.query
+            .filter(Profile.id != current_profile.id)
+            .order_by(Profile.display_name)
+            .all()
+        )
+
+        contacts = [
+            profile_to_card(profile)
+            for profile in candidate_profiles
+        ]
+
+    return render_template(
+        "messages.html",
+        current_profile=current_profile,
+        contacts=contacts,
+        is_logged_in=True
+    )
 
 
 @app.route("/login", methods=["GET", "POST"])
