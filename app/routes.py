@@ -541,9 +541,12 @@ def login():
                 show_login_modal=True,
                 login_error="Invalid email or password."
             )
+        
+        remember = request.form.get("remember") == "on"
+
 
         #Create session
-        login_user(user)
+        login_user(user, remember=remember)
 
         #Redirect after login
         return redirect(url_for("home"))
