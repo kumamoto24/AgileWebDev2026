@@ -17,10 +17,5 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"  # where to redirect if not logged in
 
-@login_manager.user_loader
-def load_user(user_id):
-    from app.models import User
-    return User.query.get(int(user_id))
 
-
-from app import routes,models,sockets
+from app import routes,models,sockets, user_loader 
