@@ -14,8 +14,20 @@ def build_profile_image_url(image_path):
     if not image_path:
         return url_for("static", filename="images/default-profile.png")
 
-    if image_path.startswith(("http://", "https://", "/static/")):
+    if image_path.startswith(("http://", "https://")):
         return image_path
+    
+    # Handle situation where file does not exist in filesystem
+    static_prefix = "/static/"
+    if image_path.startswith(static_prefix):
+        filename = image_path[len(static_prefix):]  
+    else:
+        filename = image_path
+
+    full_path = os.path.join(current_app.static_folder, filename)
+
+    if not os.path.exists(full_path):
+        return url_for("static", filename="images/default-profile.png")
 
     return url_for("static", filename=image_path)
 
@@ -150,10 +162,23 @@ def calculate_match_score(shared_interest_count, distance, candidate):
 
     return interest_score + distance_score + completeness_score
 
+# Helper function: get feature profiles
+def get_feature_profile():
+    featured_profiles = (
+        Profile.query
+        .order_by(db.func.random())
+        .limit(3)
+        .all())
+    return [profile_to_card(profile) for profile in featured_profiles]
+
+
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html", is_logged_in=False,profiles=sample_profiles)
+    return render_template(
+        "index.html", 
+        is_logged_in=False,
+        profiles= get_feature_profile())
 
 
 @app.route("/home")
@@ -551,7 +576,7 @@ def login():
     return render_template(
         "index.html",
         is_logged_in=False,
-        profiles=sample_profiles,
+        profiles=get_feature_profile(),
         show_login_modal=True
     )
 
