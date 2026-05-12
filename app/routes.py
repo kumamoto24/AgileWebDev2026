@@ -8,6 +8,7 @@ from sqlalchemy import or_
 from app.models import Profile, Interest, User
 
 from math import radians, sin, cos, sqrt, atan2
+from functools import wraps
 
 #Helper function: Load image
 def build_profile_image_url(image_path):
@@ -150,6 +151,25 @@ def calculate_match_score(shared_interest_count, distance, candidate):
 
     return interest_score + distance_score + completeness_score
 
+
+# Helper function: profile required
+def profile_required(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("index"))
+
+        user = User.query.get(session["user_id"])
+        profile = user.profile if user else None
+
+        if not profile or not profile.is_complete:
+            flash("Please complete your profile first.")
+            return redirect(url_for("profile"))
+
+        return view_func(*args, **kwargs)
+
+    return wrapped_view
+ 
 @app.route("/")
 @app.route("/index")
 def index():
@@ -157,6 +177,7 @@ def index():
 
 
 @app.route("/home")
+@profile_required
 def home():
 
     '''
@@ -235,15 +256,8 @@ def signup():
         # 2. AUTOMATIC PROFILE CREATION
         # We create a blank profile so the 'myprofile' page has data to find
         new_profile = Profile(
-            user_id=new_user.id,
-            display_name="New Member", # Placeholder name
-            age=18,                   # Required field default
-            gender="Not Specified",    # For recommendation algorithm
-            orientation="Not Specified",
-            location_text="Unknown",
-            latitude=0.0,
-            longitude=0.0,
-            place_id="default"
+            id = new_user.id,
+            user_id=new_user.id
         )
         db.session.add(new_profile)
         
@@ -265,6 +279,7 @@ def signup():
 
 
 @app.route("/api/recommended-profiles")
+@profile_required
 def recommended_profiles():
     '''
     # Temporary: use the first profile as the current user profile (login has not been developed)
@@ -293,6 +308,9 @@ def recommended_profiles():
     recommendations = []
 
     for candidate in candidate_profiles:
+        if not candidate.is_complete:
+            continue
+
         if not compatible(current_profile, candidate):
             continue
 
@@ -333,6 +351,7 @@ def recommended_profiles():
 
 
 @app.route("/api/search-profiles", methods=["GET"])
+@profile_required
 def search_profiles():
     keyword = request.args.get("keyword", "").strip()
 
@@ -388,6 +407,9 @@ def search_profiles():
     results = []
 
     for profile in candidate_profiles:
+        if not profile.is_complete:
+            continue
+
         # 1. Search bar location is used only to filter search results.
         if search_latitude is not None and search_longitude is not None:
             distance_from_search_location = calculate_distance_km(
@@ -422,11 +444,13 @@ def search_profiles():
 
 
 
-@app.route("/profile/<int:user_id>", methods=["GET", "POST"])
-def profile(user_id):
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
     # 1. SECURITY: Ensure the logged-in user can only edit their own profile
-    if "user_id" not in session or session['user_id'] != user_id:
+    if "user_id" not in session:
         return redirect(url_for("index"))
+
+    user_id = session["user_id"]
 
     # 2. SEARCH: Find the user's profile
     user_profile = Profile.query.filter_by(user_id=user_id).first()
@@ -439,10 +463,15 @@ def profile(user_id):
             db.session.add(user_profile)
 
         # Assign values from the form
-        user_profile.display_name = request.form.get("name")
+        user_profile.display_name = request.form.get("display_name")
+        user_profile.age = request.form.get("age", type=int)
         user_profile.bio = request.form.get("bio")
         user_profile.gender = request.form.get("gender")
         user_profile.orientation = request.form.get("orientation")
+        user_profile.location_text = request.form.get("location_text")
+        user_profile.latitude = request.form.get("latitude", type=float)
+        user_profile.longitude = request.form.get("longitude", type=float)
+        user_profile.place_id = request.form.get("place_id")
         
         # Handle interests
         submitted_interests = request.form.getlist("interest")
@@ -454,7 +483,7 @@ def profile(user_id):
 
         db.session.commit()
         # Redirect back to the dynamic URL
-        return redirect(url_for('profile', user_id=user_id))
+        return redirect(url_for("profile"))
     
     # 4. HANDLE GET (Displaying data)
     all_interests = Interest.query.all()
@@ -510,12 +539,30 @@ def handle_like(profile_id):
 
 @app.route("/profile/update", methods=["POST"])
 def update_profile():
-    User.name = request.form.get("name")
-    db.session.commit()
-    return redirect(url_for('profile'))
-    # data = request.get_json()
+    if "user_id" not in session:
+        return redirect(url_for("index"))
 
-    # return jsonify({"status": "success", "message": "Profile updated"}), 200
+    user = User.query.get(session["user_id"])
+    if not user:
+        return redirect(url_for("index"))
+
+    profile = user.profile
+    if not profile:
+        profile = Profile(user_id=user.id)
+        db.session.add(profile)
+
+    profile.display_name = request.form.get("display_name")
+    profile.age = request.form.get("age", type=int)
+    profile.gender = request.form.get("gender")
+    profile.orientation = request.form.get("orientation")
+    profile.location_text = request.form.get("location_text")
+    profile.latitude = request.form.get("latitude", type=float)
+    profile.longitude = request.form.get("longitude", type=float)
+    profile.place_id = request.form.get("place_id")
+    profile.bio = request.form.get("bio")
+
+    db.session.commit()
+    return redirect(url_for("profile"))
 
 
 @app.route("/story/update", methods=["POST"])
@@ -529,6 +576,7 @@ def update_story():
 
 # '/matches' to be deleted
 @app.route("/matches")
+@profile_required
 def matches():
 
     if "user_id" not in session:
@@ -538,6 +586,7 @@ def matches():
 
 
 @app.route("/messages", methods=["GET", "POST"])
+@profile_required
 def messages():
 
     if "user_id" not in session:

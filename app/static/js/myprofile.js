@@ -46,7 +46,28 @@ async function verifyLocationManually(text) {
         return new Promise((resolve) => {
             service.getPlacePredictions(request, (predictions, status) => {
                 if (status === "OK" && predictions.length > 0) {
-                    resolve(predictions[0]);
+                    const prediction = predictions[0];
+                    const detailsService = new google.maps.places.PlacesService(document.createElement("div"));
+
+                    detailsService.getDetails(
+                      {
+                        placeId: prediction.place_id,
+                        fields: ["place_id", "formatted_address", "name", "geometry"]
+                      },
+                      (place, detailsStatus) => {
+                        if (detailsStatus !== "OK" || !place) {
+                          resolve(null);
+                          return;
+                        }
+
+                        resolve({
+                          place_id: place.place_id,
+                          description: place.formatted_address || place.name || prediction.description,
+                          latitude: place.geometry?.location?.lat(),
+                          longitude: place.geometry?.location?.lng()
+                        });
+                      }
+                    );
                 } else {
                     resolve(null);
                 }
@@ -194,7 +215,7 @@ profileForm.addEventListener("submit", async (event) => {
   }
 
   // 3. Location validation
-  const locIdInput = document.getElementById("locationPlaceIdInput");
+  const locIdInput = document.getElementById("locationPlaceId");
   let placeId = locIdInput ? locIdInput.value : null;
 
   if (!placeId && locationInput.value.trim()) {
@@ -203,6 +224,8 @@ profileForm.addEventListener("submit", async (event) => {
     if (verified) {
       if (locIdInput) locIdInput.value = verified.place_id;
       locationInput.value = verified.description;
+      document.getElementById("locationLatitude").value = verified.latitude || "";
+      document.getElementById("locationLongitude").value = verified.longitude || "";
       placeId = verified.place_id;
     }
   }
@@ -248,7 +271,7 @@ function initAutocomplete() {
 
   const autocomplete = new google.maps.places.Autocomplete(locationInput, {
     types: ["(cities)"],
-    fields: ["place_id", "name", "formatted_address"]
+    fields: ["place_id", "name", "formatted_address", "geometry"]
   });
 
   autocomplete.addListener("place_changed", () => {
@@ -256,6 +279,11 @@ function initAutocomplete() {
 
     locationInput.value = place.formatted_address || place.name || "";
     document.getElementById("locationPlaceId").value = place.place_id || "";
+
+    if (place.geometry && place.geometry.location) {
+      document.getElementById("locationLatitude").value = place.geometry.location.lat();
+      document.getElementById("locationLongitude").value = place.geometry.location.lng();
+    }
   });
 }
 
@@ -432,6 +460,4 @@ storyForm.addEventListener("submit", async (event) => {
 
 //   storyModal.style.display = "none";
 // });
-
-
 

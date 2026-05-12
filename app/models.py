@@ -45,15 +45,15 @@ class Profile(db.Model):
         nullable=False
     )
 
-    display_name = db.Column(db.String(80), nullable=False)
+    display_name = db.Column(db.String(80))
     bio = db.Column(db.Text)
-    age = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(30), nullable=False)
-    orientation = db.Column(db.String(30), nullable=False)
-    location_text = db.Column(db.String(120), index=True,nullable=False)
-    latitude = db.Column(db.Float,nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
-    place_id = db.Column(db.String(128), nullable=False)
+    age = db.Column(db.Integer)
+    gender = db.Column(db.String(30))
+    orientation = db.Column(db.String(30))
+    location_text = db.Column(db.String(120), index=True)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    place_id = db.Column(db.String(128))
 
     profile_image_path = db.Column(db.String(255))
 
@@ -82,6 +82,22 @@ class Profile(db.Model):
         cascade="all, delete-orphan",
         order_by="Story.display_order"
     )
+
+    @property
+    def is_complete(self):
+        required_fields = [
+            self.display_name,
+            self.age,
+            self.gender,
+            self.orientation,
+            self.location_text,
+            self.latitude,
+            self.longitude,
+            self.place_id,
+        ]
+
+        return all(field is not None and field != "" for field in required_fields) and len(self.interests) > 0
+
 
 
 class Interest(db.Model):
