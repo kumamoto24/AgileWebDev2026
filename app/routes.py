@@ -11,6 +11,7 @@ from math import radians, sin, cos, sqrt, atan2
 
 from flask_login import login_user
 from flask_login import logout_user
+from flask_login import current_user
 
 #Helper function: Load image
 def build_profile_image_url(image_path):
@@ -172,7 +173,7 @@ def home():
     # if "user_id" not in session:
     #     return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile
     current_profile = current_user.profile if current_user else None
 
     username = (
@@ -260,7 +261,7 @@ def recommended_profiles():
     # if "user_id" not in session:
     #     return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile
     current_profile = current_user.profile if current_user else None
 
     if not current_profile:
@@ -340,7 +341,7 @@ def search_profiles():
     # if "user_id" not in session:
     #     return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile
     current_profile = current_user.profile if current_user else None
     
     if current_profile is None:
@@ -496,7 +497,7 @@ def messages():
     # if "user_id" not in session:
     #     return redirect(url_for("index"))
 
-    current_user = User.query.get(session["user_id"])
+    current_profile = current_user.profile
     current_profile = current_user.profile if current_user else None
 
     contacts = []
