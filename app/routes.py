@@ -1,4 +1,4 @@
-from flask import flash, render_template, jsonify, request, redirect, url_for, current_app, session
+from flask import flash, render_template, jsonify, request, redirect, url_for, current_app
 
 from app import app, db
 import os
@@ -10,6 +10,7 @@ from app.models import Profile, Interest, User
 from math import radians, sin, cos, sqrt, atan2
 
 from flask_login import login_user, login_required, current_user, logout_user
+from functools import wraps
 
 #Helper function: Load image
 def build_profile_image_url(image_path):
@@ -134,6 +135,24 @@ def calculate_match_score(shared_interest_count, distance, candidate):
 
     return interest_score + distance_score + completeness_score
 
+
+# Helper function: profile required
+def profile_required(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for("login"))
+
+        profile = current_user.profile
+
+        if not profile or not profile.is_complete:
+            flash("Please complete your profile first.")
+            return redirect(url_for("profile"))
+
+        return view_func(*args, **kwargs)
+
+    return wrapped_view
+ 
 # Helper function: get feature profiles
 def get_feature_profile():
     featured_profiles = (
@@ -155,16 +174,8 @@ def index():
 
 @app.route("/home")
 @login_required
+@profile_required
 def home():
-
-    '''
-    # Temporary: use the first profile as the current user profile
-    current_profile = Profile.query.first()
-    '''
-    #Replaced with @login_required and flask-login session management
-    # # Give back the login session
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
 
     current_profile = current_user.profile
 
@@ -185,20 +196,19 @@ def home():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-
     if request.method == "POST":
-
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
         confirm_password = request.form.get("confirm_password", "").strip()
 
-        #Check required fields
+        # Check required fields
         if not email or not password or not confirm_password:
             return render_template(
                 "signup.html",
                 is_logged_in=False,
                 signup_error="Please complete all required fields."
             )
+            
         # Password length validation
         if len(password) < 8 or len(password) > 64:
             return render_template(
@@ -206,7 +216,8 @@ def signup():
                 is_logged_in=False,
                 signup_error="Password must be between 8 and 64 characters."
             )
-        #Check passwords match
+
+        # Check passwords match
         if password != confirm_password:
             return render_template(
                 "signup.html",
@@ -214,9 +225,8 @@ def signup():
                 signup_error="Passwords do not match."
             )
 
-        #Check duplicate email
+        # Check duplicate email
         existing_user = User.query.filter_by(email=email).first()
-
         if existing_user:
             return render_template(
                 "signup.html",
@@ -224,26 +234,41 @@ def signup():
                 signup_error="Email already registered."
             )
 
-        #Create new user
+        # 1. Create and Save the User
         new_user = User(email=email)
-
-        #Hash password
         new_user.set_password(password)
-
-        #Save to database
         db.session.add(new_user)
+        # Use flush to get the new_user.id before the final commit
+        db.session.flush() 
+
+        # 2. AUTOMATIC PROFILE CREATION
+        # We create a blank profile so the 'myprofile' page has data to find
+        new_profile = Profile(
+            id = new_user.id,
+            user_id=new_user.id
+        )
+        db.session.add(new_profile)
+        
+        # Finalize both User and Profile in the database
         db.session.commit()
 
-        #Redirect after successful signup
-        return redirect(url_for("login"))
+        # 3. AUTO-LOGIN
+        # Let Flask-Login manage the login session.
+        login_user(new_user)
+
+        # 4. REDIRECT TO PROFILE
+        # Direct them to fill out their bio and interests
+        return redirect(url_for("profile"))
 
     return render_template(
         "signup.html",
         is_logged_in=False
     )
 
+
 @app.route("/api/recommended-profiles")
 @login_required
+@profile_required
 def recommended_profiles():
     '''
     # Temporary: use the first profile as the current user profile (login has not been developed)
@@ -272,6 +297,9 @@ def recommended_profiles():
     recommendations = []
 
     for candidate in candidate_profiles:
+        if not candidate.is_complete:
+            continue
+
         if not compatible(current_profile, candidate):
             continue
 
@@ -313,6 +341,7 @@ def recommended_profiles():
 
 @app.route("/api/search-profiles", methods=["GET"])
 @login_required
+@profile_required
 def search_profiles():
     keyword = request.args.get("keyword", "").strip()
 
@@ -325,13 +354,6 @@ def search_profiles():
     search_latitude = request.args.get("latitude", type=float)
     search_longitude = request.args.get("longitude", type=float)
     radius_km = request.args.get("radius_km", default=10, type=float)
-
-    '''
-    # Temporary: use the first profile in the database as the current user.
-    current_profile = Profile.query.order_by(Profile.id.asc()).first()
-    '''
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
 
     current_profile = current_user.profile
 
@@ -367,6 +389,9 @@ def search_profiles():
     results = []
 
     for profile in candidate_profiles:
+        if not profile.is_complete:
+            continue
+
         # 1. Search bar location is used only to filter search results.
         if search_latitude is not None and search_longitude is not None:
             distance_from_search_location = calculate_distance_km(
@@ -400,43 +425,54 @@ def search_profiles():
     return jsonify(results)
 
 
+
 @app.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
 
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
+    # 2. SEARCH: Find the user's profile
+    user_profile = current_user.profile
 
-    
+    # 3. HANDLE POST (Saving data)
     if request.method == "POST":
-        # Get data from form
-        submitted_name = request.form.get("name")
-        submitted_interests = request.form.getlist("interest") # 'interest' matches the 'name' attribute in HTML
+        # If no profile exists, create it now to satisfy NOT NULL constraints
+        if not user_profile:
+            user_profile = Profile(user_id=current_user.id)
+            db.session.add(user_profile)
+
+        # Assign values from the form
+        user_profile.display_name = request.form.get("display_name")
+        user_profile.age = request.form.get("age", type=int)
+        user_profile.bio = request.form.get("bio")
+        user_profile.gender = request.form.get("gender")
+        user_profile.orientation = request.form.get("orientation")
+        user_profile.location_text = request.form.get("location_text")
+        user_profile.latitude = request.form.get("latitude", type=float)
+        user_profile.longitude = request.form.get("longitude", type=float)
+        user_profile.place_id = request.form.get("place_id")
         
-        # Validation
-        if not submitted_name:
-            return "Name is required", 400
-            
-        # Security check: Ensure interest is in our master list
-        for item in submitted_interests:
-            if item not in all_interests:
-                return f"Invalid interest: {item}", 400
-        
-        # If valid, save to database/logic here
-        return redirect(url_for('profile'))
+        # Handle interests
+        submitted_interests = request.form.getlist("interest")
+        user_profile.interests = [] 
+        for name in submitted_interests:
+            interest_obj = Interest.query.filter_by(name=name).first()
+            if interest_obj:
+                user_profile.interests.append(interest_obj)
+
+        db.session.commit()
+        # Redirect back to the dynamic URL
+        return redirect(url_for("profile"))
     
-    user_data = {
-        "name": "Jane Doe",
-        "interests": ["Music", "Coffee"] # These are the ones already checked
-    }
+    # 4. HANDLE GET (Displaying data)
+    all_interests = Interest.query.all()
+    
     return render_template(
         "myprofile.html",
         interests_list=all_interests,
-        user=user_data,
+        user=user_profile, 
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
-
 
 @app.route("/profile/<int:profile_id>")
 def profile_detail(profile_id):
@@ -455,10 +491,32 @@ def handle_like(profile_id):
 
 
 @app.route("/profile/update", methods=["POST"])
+@login_required
 def update_profile():
-    data = request.get_json()
+    profile = current_user.profile
+    if not profile:
+        profile = Profile(user_id=current_user.id)
+        db.session.add(profile)
 
-    return jsonify({"status": "success", "message": "Profile updated"}), 200
+    profile.display_name = request.form.get("display_name")
+    profile.age = request.form.get("age", type=int)
+    profile.gender = request.form.get("gender")
+    profile.orientation = request.form.get("orientation")
+    profile.location_text = request.form.get("location_text")
+    profile.latitude = request.form.get("latitude", type=float)
+    profile.longitude = request.form.get("longitude", type=float)
+    profile.place_id = request.form.get("place_id")
+    profile.bio = request.form.get("bio")
+
+    submitted_interests = request.form.getlist("interest")
+    profile.interests = []
+    for name in submitted_interests:
+        interest_obj = Interest.query.filter_by(name=name).first()
+        if interest_obj:
+            profile.interests.append(interest_obj)
+
+    db.session.commit()
+    return redirect(url_for("profile"))
 
 
 @app.route("/story/update", methods=["POST"])
@@ -473,21 +531,15 @@ def update_story():
 # '/matches' to be deleted
 @app.route("/matches")
 @login_required
+@profile_required
 def matches():
-
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
-
     return "Matches page placeholder"
 
 
 @app.route("/messages", methods=["GET", "POST"])
 @login_required
+@profile_required
 def messages():
-
-    # if "user_id" not in session:
-    #     return redirect(url_for("index"))
-
     current_profile = current_user.profile
 
     contacts = []
@@ -545,7 +597,7 @@ def login():
         remember = request.form.get("remember") == "on"
 
 
-        #Create session
+        # Create Flask-Login session
         login_user(user, remember=remember)
 
         #Redirect after login
