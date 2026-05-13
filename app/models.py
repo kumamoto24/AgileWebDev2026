@@ -99,7 +99,9 @@ class Profile(db.Model):
 
         return all(field is not None and field != "" for field in required_fields) and len(self.interests) > 0
 
-
+    @property
+    def like_count(self):
+        return Likes.query.filter_by(liked_id=self.id).count()
 
 class Interest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -218,4 +220,44 @@ class Message(db.Model):
     created_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc)
+    )
+
+# Add Likes table to store like relationships between users
+# In this project, user.id strictly equals to profile.id, and is a one-to-one relationship
+class Likes(db.Model):
+    __tablename__ = "likes"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    # The profile/user who sends the like
+    liker_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    # The profile/user who receives the like
+    liked_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "liker_id",
+            "liked_id",
+            name="uq_like_pair"
+        ),
+        db.CheckConstraint(
+            "liker_id != liked_id",
+            name="ck_no_self_like"
+        ),
+        db.Index("ix_likes_liker_id", "liker_id"),
+        db.Index("ix_likes_liked_id", "liked_id"),
     )
