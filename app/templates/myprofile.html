@@ -95,13 +95,15 @@
           <h1>Edit Profile</h1>
 
           <label for="nameInput">Name:</label>
-          <input type="text" id="nameInput" name="name" value="{{ user.display_name or '' }}">
+          <input type="text" id="nameInput" name="display_name" value="{{ user.display_name or '' }}">
 
           <label for="ageInput">Age:</label>
           <input type="number" id="ageInput" name="age" value="{{ user.age or '' }}">
 
           <label for="locationInput">Location:</label>
           <input id="locationInput" name="location_text" type="text" value="{{ user.location_text or '' }}">
+          <input type="hidden" id="locationLatitude" name="latitude" value="{{ user.latitude or '' }}">
+          <input type="hidden" id="locationLongitude" name="longitude" value="{{ user.longitude or '' }}">
           <input id="locationPlaceId" name="place_id" type="hidden" value="{{ user.place_id or '' }}">
           
           <label>Interests:</label>
