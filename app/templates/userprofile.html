@@ -17,7 +17,7 @@
       <!-- Profile Picture -->
       <div class="col-md-4 profile-picture-area">
         <img
-          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=360&h=360&fit=crop"
+          src="{{ profile_image_url or url_for('static', filename='images/default-profile.png') }}"
           alt="Profile picture"
           class="myprofile-img"
         >
