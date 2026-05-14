@@ -5,7 +5,7 @@ import os
 
 
 from sqlalchemy import or_
-from app.models import Profile, Interest, User, Likes
+from app.models import Profile, Interest, User, Likes, Story
 
 from math import radians, sin, cos, sqrt, atan2
 
@@ -323,11 +323,6 @@ def signup():
 @login_required
 @profile_required
 def recommended_profiles():
-    '''
-    # Temporary: use the first profile as the current user profile (login has not been developed)
-    current_profile = Profile.query.first()
-    '''
-
 
     if not current_user.is_authenticated:
         return jsonify([])
@@ -637,14 +632,53 @@ def update_profile():
     return redirect(url_for("profile"))
 
 
-@app.route("/story/update", methods=["POST"])
+
+
+@app.route("/update-story", methods=["POST"])
+@login_required
 def update_story():
-    title = request.form.get("title")
-    description = request.form.get("description")
-    image_file = request.files.get("story_image")
-    
-    # Validation and save logic...
-    return jsonify({"status": "success"}), 200
+    profile = current_user.profile
+
+    if not profile:
+        profile = Profile(user_id=current_user.id)
+        db.session.add(profile)
+        db.session.flush()
+
+    display_order = request.form.get("display_order", type=int)
+
+    story = Story.query.filter_by(
+        profile_id=profile.id,
+        display_order=display_order
+    ).first()
+
+    if not story:
+        story = Story(
+            profile_id=profile.id,
+            display_order=display_order
+        )
+        db.session.add(story)
+
+    story.title = request.form.get("title")
+    story.description = request.form.get("description")
+
+    image_file = request.files.get("image_path")
+
+    if image_file and image_file.filename:
+        filename = secure_filename(image_file.filename)
+        image_file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+        story.image_path = filename
+
+    db.session.commit()
+
+    return jsonify({
+    "status": "success",
+    "title": story.title,
+    "description": story.description,
+    "image_path": story.image_path
+}), 200
+
+
+
 
 # '/matches' to be deleted
 @app.route("/matches")
