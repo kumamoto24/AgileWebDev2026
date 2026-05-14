@@ -104,65 +104,21 @@
               class="dropdown-menu w-100 interest-dropdown-menu"
               aria-labelledby="interestDropdownButton"
             >
-              <div class="interest-category-title">Creative</div>
+              <div class="interest-category-title">Interests</div>
 
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Music" id="interestMusic" />
-                <label class="form-check-label" for="interestMusic">Music</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Movies" id="interestMovies" />
-                <label class="form-check-label" for="interestMovies">Movies</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Art" id="interestArt" />
-                <label class="form-check-label" for="interestArt">Art</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Photography" id="interestPhotography" />
-                <label class="form-check-label" for="interestPhotography">Photography</label>
-              </div>
-
-              <div class="dropdown-divider"></div>
-
-              <div class="interest-category-title">Lifestyle</div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Travel" id="interestTravel" />
-                <label class="form-check-label" for="interestTravel">Travel</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Fitness" id="interestFitness" />
-                <label class="form-check-label" for="interestFitness">Fitness</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Food" id="interestFood" />
-                <label class="form-check-label" for="interestFood">Food</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Reading" id="interestReading" />
-                <label class="form-check-label" for="interestReading">Reading</label>
-              </div>
-
-              <div class="dropdown-divider"></div>
-
-              <div class="interest-category-title">Social</div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Gaming" id="interestGaming" />
-                <label class="form-check-label" for="interestGaming">Gaming</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Dancing" id="interestDancing" />
-                <label class="form-check-label" for="interestDancing">Dancing</label>
-              </div>
+              {% for interest in interests_list %}
+                <div class="form-check">
+                  <input
+                    class="form-check-input interest-checkbox"
+                    type="checkbox"
+                    value="{{ interest }}"
+                    id="interest{{ loop.index }}"
+                  />
+                  <label class="form-check-label" for="interest{{ loop.index }}">
+                    {{ interest }}
+                  </label>
+                </div>
+              {% endfor %}
             </div>
           </div>
         </div>
