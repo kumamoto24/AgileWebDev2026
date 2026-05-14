@@ -5,7 +5,7 @@ import os
 
 
 from sqlalchemy import or_
-from app.models import Profile, Interest, User, Likes, Story
+from app.models import Profile, Interest, User, Likes, Story, Conversation
 
 from math import radians, sin, cos, sqrt, atan2
 
@@ -749,16 +749,32 @@ def messages():
     contacts = []
 
     if current_profile:
-        candidate_profiles = (
-            Profile.query
-            .filter(Profile.id != current_profile.id)
-            .order_by(Profile.display_name)
+        conversations = (
+            Conversation.query
+            .filter(or_(
+                Conversation.profile1_id == current_profile.id,
+                Conversation.profile2_id == current_profile.id
+            ))
+            .order_by(Conversation.created_at.desc())
             .all()
         )
 
+        contact_ids = [
+            conversation.profile2_id
+            if conversation.profile1_id == current_profile.id
+            else conversation.profile1_id
+            for conversation in conversations
+        ]
+
+        profiles_by_id = {
+            profile.id: profile
+            for profile in Profile.query.filter(Profile.id.in_(contact_ids)).all()
+        } if contact_ids else {}
+
         contacts = [
-            profile_to_card(profile)
-            for profile in candidate_profiles
+            profile_to_card(profiles_by_id[contact_id])
+            for contact_id in contact_ids
+            if contact_id in profiles_by_id
         ]
 
     return render_template(
