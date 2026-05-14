@@ -214,12 +214,16 @@ block extra_head %}
         </div>
 
         <p id="password-error" class="error-message"></p>
+        
+        <div class="g-recaptcha" data-sitekey="{{ site_key }}"></div>
 
         <button class="login-btn" type="submit">Start Your Love Story</button>
       </form>
     </div>
   </div>
 </main>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
   
 {% endblock %} 
@@ -241,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
     errorMessage.textContent = "";
 
     if (password !== confirmPassword) {
-      e.preventDefault();
+      e.preventDefault()
 
       errorMessage.textContent = "Passwords do not match";
     }

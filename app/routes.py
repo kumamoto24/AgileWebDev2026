@@ -10,6 +10,7 @@ from app.models import Profile, Interest, User, Likes
 from math import radians, sin, cos, sqrt, atan2
 
 from flask_login import login_user, login_required, current_user, logout_user
+import requests
 from functools import wraps
 
 #Helper function: Load image
@@ -230,7 +231,8 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Please complete all required fields."
+                signup_error="Please complete all required fields.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
             
         # Password length validation
@@ -238,7 +240,8 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Password must be between 8 and 64 characters."
+                signup_error="Password must be between 8 and 64 characters.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
 
         # Check passwords match
@@ -246,7 +249,8 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Passwords do not match."
+                signup_error="Passwords do not match.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
 
         # Check duplicate email
@@ -255,7 +259,31 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Email already registered."
+                signup_error="Email already registered.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
+            )
+
+            # Verify reCAPTCHA
+        captcha_response = request.form.get("g-recaptcha-response")
+
+        secret_key = app.config["RECAPTCHA_SECRET_KEY"]
+
+        verify_response = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                "secret": secret_key,
+                "response": captcha_response
+            }
+        )
+
+        result = verify_response.json()
+
+        if not result.get("success"):
+            return render_template(
+                "signup.html",
+                is_logged_in=False,
+                signup_error="Please complete the CAPTCHA.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
 
         # 1. Create and Save the User
@@ -286,7 +314,8 @@ def signup():
 
     return render_template(
         "signup.html",
-        is_logged_in=False
+        is_logged_in=False,
+        site_key=app.config["RECAPTCHA_SITE_KEY"]
     )
 
 
