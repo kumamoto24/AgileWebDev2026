@@ -2,10 +2,13 @@
 
 function toggleLike(profileId) {
     const likeBtn = document.getElementById('likeBtn');
+    if (!likeBtn || !profileId) {
+        return;
+    }
     
     // 1. Optimistic UI update (change color immediately)
     const isLiked = likeBtn.classList.toggle('active');
-    likeBtn.innerHTML = isLiked ? '❤️ Liked' : '🤍 Like';
+    likeBtn.textContent = isLiked ? '❤️ Liked' : '🤍 Like';
 
     // 2. Send the data
     fetch(`/profile/${profileId}/like`, {
@@ -33,7 +36,7 @@ function toggleLike(profileId) {
         // 4. Revert UI if error occurs
         console.error('Error:', error);
         likeBtn.classList.toggle('active');
-        likeBtn.innerHTML = !isLiked ? '❤️ Liked' : '🤍 Like';
+        likeBtn.textContent = !isLiked ? '❤️ Liked' : '🤍 Like';
         alert("Couldn't save like. Please try again.");
     });
 }
@@ -46,24 +49,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const viewerTitle = document.getElementById("viewerTitle");
   const viewerDescription = document.getElementById("viewerDescription");
   const closeViewer = document.getElementById("closeViewer");
+  if (!viewer || !viewerImg || !viewerTitle || !viewerDescription || !closeViewer) {
+    return;
+  }
+
+  const openStoryViewer = (card) => {
+    const image = card.querySelector(".story-img");
+    const title = card.querySelector(".card-title");
+    const description = card.querySelector(".card-text");
+
+    viewerImg.src = image ? image.src : "";
+    viewerTitle.textContent = title ? title.textContent.trim() : "";
+    viewerDescription.textContent = description ? description.textContent.trim() : "";
+    viewer.style.display = "block";
+  };
 
   // Select all story cards
   const storyCards = document.querySelectorAll(".story-section .card");
 
   storyCards.forEach(card => {
     card.addEventListener("click", () => {
-      // Extract data from the clicked card
-      const imgPath = card.querySelector(".story-img").src;
-      const title = card.querySelector(".card-title").textContent;
-      const description = card.querySelector(".card-text").textContent;
-
-      // Inject into modal
-      viewerImg.src = imgPath;
-      viewerTitle.textContent = title;
-      viewerDescription.textContent = description;
-
-      // Show modal
-      viewer.style.display = "block";
+      openStoryViewer(card);
     });
   });
 
@@ -87,13 +93,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const bioModal = document.getElementById("bioViewer");
   const bioFullText = document.getElementById("bioViewerFullText");
   const closeBio = document.getElementById("closeBioViewer");
-  const displayName = document.querySelector(".basic-info h1").textContent;
+  const displayName = document.querySelector(".basic-info h1");
+  const bioViewerName = document.getElementById("bioViewerName");
+  if (!bioSpan || !bioModal || !bioFullText || !closeBio || !displayName || !bioViewerName) {
+    return;
+  }
 
   // Open Modal
   bioSpan.addEventListener("click", () => {
     // Get the full text (textContent ignores the CSS clamping)
     bioFullText.textContent = bioSpan.textContent.trim();
-    document.getElementById("bioViewerName").textContent = displayName + "'s Bio";
+    bioViewerName.textContent = `${displayName.textContent.trim()}'s Bio`;
     
     bioModal.style.display = "block";
   });
