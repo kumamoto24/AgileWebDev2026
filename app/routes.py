@@ -558,43 +558,6 @@ def update_story():
     "description": story.description,
     "image_path": story.image_path
 }), 200
-# @app.route("/story/update/<int:story_id>", methods=["POST"])
-# @login_required
-# def update_story(story_id):
-
-#     profile = current_user.profile
-
-#     if not profile:
-#         return redirect(url_for("profile"))
-
-#     story = Story.query.filter_by(
-#         id=story_id,
-#         profile_id=profile.id
-#     ).first()
-
-#     # CREATE if story does not exist yet
-#     if not story:
-#         story = Story(
-#             id=story_id,
-#             profile_id=profile.id
-#         )
-#         db.session.add(story)
-
-#     story.title = request.form.get("title")
-#     story.description = request.form.get("description")
-
-#     db.session.commit()
-
-#     return redirect(url_for("profile"))
-
-# def update_story():
-#     title = request.form.get("title")
-#     description = request.form.get("description")
-#     image_file = request.files.get("story_image")
-    
-#     # Validation and save logic...
-#     return jsonify({"status": "success"}), 200
-
 
 
 
