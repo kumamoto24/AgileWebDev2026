@@ -15,3 +15,7 @@ class Config:
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+        # Google reCAPTCHA
+    RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY")
+    RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY")
