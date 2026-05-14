@@ -5,11 +5,12 @@ import os
 
 
 from sqlalchemy import or_
-from app.models import Profile, Interest, User, Story
+from app.models import Profile, Interest, User, Likes, Story
 
 from math import radians, sin, cos, sqrt, atan2
 
 from flask_login import login_user, login_required, current_user, logout_user
+import requests
 from functools import wraps
 
 #Helper function: Load image
@@ -33,6 +34,30 @@ def build_profile_image_url(image_path):
         return url_for("static", filename="images/default-profile.png")
 
     return url_for("static", filename=image_path)
+
+# Helper function: Load story image
+def build_story_image_url(image_path):
+    default_story_image = "images/default-story.jpg"
+
+    if not image_path:
+        return url_for("static", filename=default_story_image)
+
+    if image_path.startswith(("http://", "https://")):
+        return image_path
+
+    # Handle situation where file does not exist in filesystem
+    static_prefix = "/static/"
+    if image_path.startswith(static_prefix):
+        filename = image_path[len(static_prefix):]
+    else:
+        filename = image_path
+
+    full_path = os.path.join(current_app.static_folder, filename)
+
+    if not os.path.exists(full_path):
+        return url_for("static", filename=default_story_image)
+
+    return url_for("static", filename=filename)
 
 #Helper function: Convert progiles to cards
 def profile_to_card(profile, distance=None, match_score=None):
@@ -206,7 +231,8 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Please complete all required fields."
+                signup_error="Please complete all required fields.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
             
         # Password length validation
@@ -214,7 +240,8 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Password must be between 8 and 64 characters."
+                signup_error="Password must be between 8 and 64 characters.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
 
         # Check passwords match
@@ -222,7 +249,8 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Passwords do not match."
+                signup_error="Passwords do not match.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
 
         # Check duplicate email
@@ -231,7 +259,31 @@ def signup():
             return render_template(
                 "signup.html",
                 is_logged_in=False,
-                signup_error="Email already registered."
+                signup_error="Email already registered.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
+            )
+
+            # Verify reCAPTCHA
+        captcha_response = request.form.get("g-recaptcha-response")
+
+        secret_key = app.config["RECAPTCHA_SECRET_KEY"]
+
+        verify_response = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                "secret": secret_key,
+                "response": captcha_response
+            }
+        )
+
+        result = verify_response.json()
+
+        if not result.get("success"):
+            return render_template(
+                "signup.html",
+                is_logged_in=False,
+                signup_error="Please complete the CAPTCHA.",
+                site_key=app.config["RECAPTCHA_SITE_KEY"]
             )
 
         # 1. Create and Save the User
@@ -262,7 +314,8 @@ def signup():
 
     return render_template(
         "signup.html",
-        is_logged_in=False
+        is_logged_in=False,
+        site_key=app.config["RECAPTCHA_SITE_KEY"]
     )
 
 
@@ -386,7 +439,9 @@ def search_profiles():
     for profile in candidate_profiles:
         if not profile.is_complete:
             continue
-
+        # Filter the correct orientation
+        if not compatible(current_profile, profile):
+            continue
         # 1. Search bar location is used only to filter search results.
         if search_latitude is not None and search_longitude is not None:
             distance_from_search_location = calculate_distance_km(
@@ -470,19 +525,82 @@ def profile():
     )
 
 @app.route("/profile/<int:profile_id>")
+@login_required
+@profile_required
 def profile_detail(profile_id):
+    profile = Profile.query.get_or_404(profile_id)
+    current_profile = current_user.profile
+
+    is_liked = Likes.query.filter_by(
+        liker_id=current_profile.id,
+        liked_id=profile.id
+    ).first() is not None
+
+    stories = [
+        {
+            "id": story.id,
+            "title": story.title,
+            "description": story.description,
+            "image_url": build_story_image_url(story.image_path),
+            "display_order": story.display_order,
+        }
+        for story in profile.stories
+    ]
+
+    profile_data = {
+        "id": profile.id,
+        "display_name": profile.display_name,
+        "age": profile.age,
+        "location_text": profile.location_text,
+        "gender": profile.gender,
+        "orientation": profile.orientation,
+        "bio": profile.bio,
+        "profile_image_url": build_profile_image_url(profile.profile_image_path),
+        "interests": [interest.name for interest in profile.interests],
+        "stories": stories,
+        "is_liked": is_liked,
+    }
+
     return render_template(
         "userprofile.html",
-        profile_id=profile_id
+        profile=profile_data,
+        is_logged_in=True
     )
 
 @app.route("/profile/<int:profile_id>/like", methods=["POST"])
+@login_required
+@profile_required
 def handle_like(profile_id):
-    # This logic only runs when the 'Like' button is clicked, 
-    # it does not load a new page.
-    data = request.get_json()
-    print(f"Received {data.get('action')} for profile {profile_id}")
-    return jsonify({"status": "success"}), 200
+    current_profile = current_user.profile
+    liked_profile = Profile.query.get_or_404(profile_id)
+
+    if liked_profile.id == current_profile.id:
+        return jsonify({"status": "error", "message": "You cannot like yourself."}), 400
+
+    data = request.get_json(silent=True) or {}
+    action = data.get("action")
+
+    existing_like = Likes.query.filter_by(
+        liker_id=current_profile.id,
+        liked_id=liked_profile.id
+    ).first()
+
+    if action == "like":
+        if not existing_like:
+            db.session.add(Likes(
+                liker_id=current_profile.id,
+                liked_id=liked_profile.id
+            ))
+            db.session.commit()
+        return jsonify({"status": "success", "is_liked": True}), 200
+
+    if action == "unlike":
+        if existing_like:
+            db.session.delete(existing_like)
+            db.session.commit()
+        return jsonify({"status": "success", "is_liked": False}), 200
+
+    return jsonify({"status": "error", "message": "Invalid like action."}), 400
 
 
 @app.route("/profile/update", methods=["POST"])

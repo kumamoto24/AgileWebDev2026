@@ -10,58 +10,64 @@
 {% endblock %}
 
 {% block content %}
-<main class="myprofile-page">
+<main class="myprofile-page" data-profile-id="{{ profile.id }}">
   <section class="profile-section container">
     <div class="row g-4 align-items-start">
 
       <!-- Profile Picture -->
       <div class="col-md-4 profile-picture-area">
         <img
-          src="{{ profile_image_url or url_for('static', filename='images/default-profile.png') }}"
-          alt="Profile picture"
+          src="{{ profile.profile_image_url }}"
+          alt="{{ profile.display_name or 'HeartLink Member' }} profile picture"
           class="myprofile-img"
         >
 
         <button 
             id="likeBtn" 
-            class="btn btn-like mt-3" 
+            class="btn btn-like mt-3 {% if profile.is_liked %}active{% endif %}" 
             type="button" 
-            onclick="toggleLike('{{ profile_user_id }}')">
-            🤍 Like
+            onclick="toggleLike('{{ profile.id }}')">
+            {% if profile.is_liked %}❤️ Liked{% else %}🤍 Like{% endif %}
         </button>
       </div>
 
       <!-- Display Info -->
       <div class="col-md-8 basic-info">
-        <h1>Jane Doe</h1>
+        <h1>{{ profile.display_name or "HeartLink Member" }}</h1>
 
         <p>
           <strong>Age:</strong>
-          <span>24</span>
+          <span>{{ profile.age or "Not specified" }}</span>
         </p>
 
         <p>
           <strong>Location:</strong>
-          <span>Perth, Australia</span>
+          <span>{{ profile.location_text or "Not specified" }}</span>
         </p>
 
         <p>
           <strong>Interests:</strong>
-          <span>Music, Movies, Fitness, Cooking</span>
+          <span>
+            {% for interest in profile.interests %}
+              {{ interest }}{% if not loop.last %}, {% endif %}
+            {% else %}
+              No interests selected
+            {% endfor %}
+          </span>
         </p>
 
         <p>
-          <strong>Gender:</strong> <span>Woman</span>
+          <strong>Gender:</strong> <span>{{ profile.gender or "Not specified" }}</span>
         </p>
 
         <p>
-          <strong>Orientation:</strong> <span>Straight</span>
+          <strong>Orientation:</strong> <span>{{ profile.orientation or "Not specified" }}</span>
         </p>
 
         <p>
           <strong>Bio:</strong>
           <span id="displayBio" class="clickable-bio text-truncate-2">
-            I love coffee, music, traveling, and meeting new people! This is a very long bio that will eventually trigger the ellipsis so that users can click to see more information about Jane in a beautiful popup modal.
+            {{ profile.bio or "No bio yet..." }}
           </span>
         </p>
         </div>
@@ -69,7 +75,7 @@
         <div id="bioViewer" class="story-viewer-modal">
         <div class="viewer-content">
           <span id="closeBioViewer" class="close-btn">&times;</span>
-          <h2 id="bioViewerName">Jane Doe</h2>
+          <h2 id="bioViewerName">{{ profile.display_name or "HeartLink Member" }}</h2>
           <hr>
           <p id="bioViewerFullText"></p>
         </div>
@@ -83,62 +89,23 @@
     <h1 class="text-center">Their Story</h1>
 
     <div class="row justify-content-center g-4">
-
-      <!-- Story 1 -->
-      <div class="col-md-4">
-        <div class="card h-100 story-card">
-          <img
-            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&h=420&fit=crop"
-            class="card-img-top story-img"
-            alt="Beach story"
-          >
-          <div class="card-body text-center">
-            <h5 class="card-title">Beach Day</h5>
-            <p class="card-text">
-              A day at the beach.
-            </p>
+      {% for story in profile.stories %}
+        <div class="col-md-4">
+          <div class="card h-100 story-card">
+            <img
+              src="{{ story.image_url }}"
+              class="card-img-top story-img"
+              alt="{{ story.title }} story"
+            >
+            <div class="card-body text-center">
+              <h5 class="card-title">{{ story.title }}</h5>
+              <p class="card-text">{{ story.description or "No description yet." }}</p>
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Story 2 -->
-      <div class="col-md-4">
-        <div class="card h-100 story-card">
-          <img
-            src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=640&h=420&fit=crop"
-            class="card-img-top story-img"
-            alt="Coffee story"
-          >
-          <div class="card-body text-center">
-            <h5 class="card-title">Coffee Date</h5>
-            <p class="card-text">
-              Coffee date vibes.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Story 3 -->
-      <div class="col-md-4">
-        <div class="card h-100 story-card">
-          <img
-            src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=640&h=420&fit=crop"
-            class="card-img-top story-img"
-            alt="Opera House story"
-          >
-          <div class="card-body text-center">
-            <h5 class="card-title">ABC maximum is 21</h5>
-            <p class="card-text">
-              Opera House sightseeing.
-              The text is not going out of the card even if text is too long.
-              ffffffffffffffffffffffffffffffffffffffffffffffffffff
-              iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
-              maximum is 1500 characters
-            </p>
-          </div>
-        </div>
-      </div>
-
+      {% else %}
+        <p class="text-center text-muted mb-0">No stories added yet.</p>
+      {% endfor %}
     </div>
   </section>
 </main>
@@ -152,5 +119,8 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/userprofile.js') }}"></script>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{{ url_for('static', filename='js/userprofile.js') }}"></script>
 {% endblock %}
