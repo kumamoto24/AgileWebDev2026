@@ -14,6 +14,9 @@ from werkzeug.utils import secure_filename
 import requests
 from functools import wraps
 
+# Interest list (global)
+all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
+
 #Helper function: Load image
 def build_profile_image_url(image_path):
     if not image_path:
@@ -125,8 +128,6 @@ def calculate_distance_km(lat1, lon1, lat2, lon2):
 
     return round(earth_radius_km * c, 1)
 
-# Interest list (global)
-all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
 
 # Helper function: filter compatible recommended candidate
 def compatible(current_profile, candidate):
@@ -246,6 +247,7 @@ def home():
         "logged_in_homepage.html",
         username=username,
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
+        interests_list=all_interests,
         is_logged_in=True
     )
 
