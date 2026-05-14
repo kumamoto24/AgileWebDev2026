@@ -320,14 +320,16 @@ const closeStory = document.getElementById("closeStory");
 const storyPicInput = document.getElementById("storyPicInput");
 const storyTitleInput = document.getElementById("storyTitleInput");
 const storyDescriptionInput = document.getElementById("storyDescriptionInput");
+const storyOrderInput = document.getElementById("storyOrderInput");
 
 let selectedStoryCard = null;
 
 function openStoryEditor(card) {
   selectedStoryCard = card;
 
-  storyTitleInput.value = card.querySelector(".story-title").textContent;
-  storyDescriptionInput.value = card.querySelector(".story-description").textContent.trim();
+  storyOrderInput.value = card.dataset.storyOrder;
+  storyTitleInput.value = card.dataset.storyTitle || "";
+  storyDescriptionInput.value = card.dataset.storyDescription || "";
   storyPicInput.value = "";
 
   storyModal.style.display = "block";
@@ -403,8 +405,14 @@ storyForm.addEventListener("submit", async (event) => {
       const result = await response.json();
 
       // --- 4. Success: Update UI Display ---
-      selectedStoryCard.querySelector(".story-title").textContent = titleValue;
-      selectedStoryCard.querySelector(".story-description").textContent = descValue;
+      const savedTitle = result.title || titleValue || "Untitled Story";
+      const savedDescription = result.description || descValue || "No description yet.";
+
+      selectedStoryCard.querySelector(".story-title").textContent = savedTitle;
+      selectedStoryCard.querySelector(".story-description").textContent = savedDescription;
+      selectedStoryCard.dataset.storyTitle = savedTitle;
+      selectedStoryCard.dataset.storyDescription = result.description || descValue;
+      selectedStoryCard.classList.remove("story-card-empty");
 
       // Update image preview using the local file (fast) or server path
       if (file) {
@@ -413,6 +421,8 @@ storyForm.addEventListener("submit", async (event) => {
           selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
         };
         reader.readAsDataURL(file);
+      } else if (result.image_url) {
+        selectedStoryCard.querySelector(".story-img").src = result.image_url;
       }
 
       storyModal.style.display = "none";
@@ -425,5 +435,4 @@ storyForm.addEventListener("submit", async (event) => {
     alert("Network error. Please check your connection and try again.");
   }
 });
-
 

@@ -10,6 +10,7 @@ from app.models import Profile, Interest, User, Likes, Story
 from math import radians, sin, cos, sqrt, atan2
 
 from flask_login import login_user, login_required, current_user, logout_user
+from werkzeug.utils import secure_filename
 import requests
 from functools import wraps
 
@@ -58,6 +59,37 @@ def build_story_image_url(image_path):
         return url_for("static", filename=default_story_image)
 
     return url_for("static", filename=filename)
+
+def build_story_slots(stories, slot_count=3):
+    stories_by_order = {}
+
+    for story in stories:
+        if story.display_order and 1 <= story.display_order <= slot_count:
+            stories_by_order[story.display_order] = story
+
+
+    story_slots = []
+    for display_order in range(1, slot_count + 1):
+        story = stories_by_order.get(display_order)
+
+        if story:
+            story_slots.append({
+                "title": story.title,
+                "description": story.description,
+                "image_url": build_story_image_url(story.image_path),
+                "display_order": display_order,
+                "is_empty": False,
+            })
+        else:
+            story_slots.append({
+                "title": "Add Story",
+                "description": "Share a moment from your life.",
+                "image_url": build_story_image_url(None),
+                "display_order": display_order,
+                "is_empty": True,
+            })
+
+    return story_slots
 
 #Helper function: Convert progiles to cards
 def profile_to_card(profile, distance=None, match_score=None):
@@ -515,11 +547,14 @@ def profile():
     
     # 4. HANDLE GET (Displaying data)
     all_interests = Interest.query.all()
+    story_slots = build_story_slots(user_profile.stories if user_profile else [])
     
     return render_template(
         "myprofile.html",
         interests_list=all_interests,
         user=user_profile, 
+        story_slots=story_slots,
+        profile_image_url=build_profile_image_url(user_profile.profile_image_path if user_profile else None),
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
@@ -646,6 +681,12 @@ def update_story():
 
     display_order = request.form.get("display_order", type=int)
 
+    if display_order not in [1, 2, 3]:
+        return jsonify({
+            "status": "error",
+            "message": "Invalid story slot."
+        }), 400
+
     story = Story.query.filter_by(
         profile_id=profile.id,
         display_order=display_order
@@ -654,19 +695,27 @@ def update_story():
     if not story:
         story = Story(
             profile_id=profile.id,
-            display_order=display_order
+            display_order=display_order,
+            image_path="images/default-story.jpg"
         )
         db.session.add(story)
 
-    story.title = request.form.get("title")
+    story.title = request.form.get("title") or "Untitled Story"
     story.description = request.form.get("description")
 
     image_file = request.files.get("image_path")
 
     if image_file and image_file.filename:
         filename = secure_filename(image_file.filename)
-        image_file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-        story.image_path = filename
+        upload_subdir = "uploads/story_images"
+        upload_folder = current_app.config.get(
+            "UPLOAD_FOLDER",
+            os.path.join(current_app.static_folder, upload_subdir)
+        )
+        os.makedirs(upload_folder, exist_ok=True)
+
+        image_file.save(os.path.join(upload_folder, filename))
+        story.image_path = os.path.join(upload_subdir, filename)
 
     db.session.commit()
 
@@ -674,7 +723,8 @@ def update_story():
     "status": "success",
     "title": story.title,
     "description": story.description,
-    "image_path": story.image_path
+    "image_path": story.image_path,
+    "image_url": build_story_image_url(story.image_path)
 }), 200
 
 

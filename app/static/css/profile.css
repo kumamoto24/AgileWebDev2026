@@ -221,6 +221,19 @@
   cursor: pointer;
 }
 
+.story-card-empty {
+  border: 2px dashed #e2d6dc;
+  box-shadow: none;
+}
+
+.story-card-empty .story-img {
+  opacity: 0.72;
+}
+
+.story-card-empty .card-title {
+  color: #b52b50;
+}
+
 
 
 
