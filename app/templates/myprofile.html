@@ -154,53 +154,30 @@
       </p>
 
       <div class="row justify-content-center g-4">
+        {% for story in story_slots %}
         <div class="col-md-4">
-          <div class="card h-100 story-card" role="button" tabindex="0">
+          <div
+            class="card h-100 story-card {% if story.is_empty %}story-card-empty{% endif %}"
+            role="button"
+            tabindex="0"
+            data-story-order="{{ story.display_order }}"
+            data-story-title="{% if not story.is_empty %}{{ story.title|e }}{% endif %}"
+            data-story-description="{% if not story.is_empty %}{{ (story.description or '')|e }}{% endif %}"
+          >
             <img
-              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&h=420&fit=crop"
+              src="{{ story.image_url }}"
               class="card-img-top story-img"
-              alt="Beach story"
+              alt="{{ story.title }} story"
             >
             <div class="card-body text-center">
-              <h5 class="card-title story-title">Beach Day</h5>
+              <h5 class="card-title story-title">{{ story.title }}</h5>
               <p class="card-text story-description">
-                (Example) A day at the beach.
+                {{ story.description or "No description yet." }}
               </p>
             </div>
           </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="card h-100 story-card" role="button" tabindex="0">
-            <img
-              src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=640&h=420&fit=crop"
-              class="card-img-top story-img"
-              alt="Coffee story"
-            >
-            <div class="card-body text-center">
-              <h5 class="card-title story-title">Coffee Date</h5>
-              <p class="card-text story-description">
-                (Example) Coffee date vibes.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card h-100 story-card" role="button" tabindex="0">
-            <img
-              src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=640&h=420&fit=crop"
-              class="card-img-top story-img"
-              alt="Sydney Opera House story"
-            >
-            <div class="card-body text-center">
-              <h5 class="card-title story-title">Opera House</h5>
-              <p class="card-text story-description">
-                (Example) Opera House sightseeing.
-              </p>
-            </div>
-          </div>
-        </div>
+        {% endfor %}
       </div>
 
       <div id="storyModal" class="profile-modal">
