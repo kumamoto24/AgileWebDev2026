@@ -16,7 +16,7 @@
         <div class="col-md-4 profile-picture-area">
           <label for="profilePicInput">
             <img
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=360&h=360&fit=crop"
+              src="{{ profile_image_url or url_for('static', filename='images/default-profile.png') }}"
               alt="Profile picture"
               class="myprofile-img"
             >
@@ -40,70 +40,69 @@
             hidden
           >
         </div>
-
         <div id="profileDisplay" class="col-md-8 basic-info">
-          <h1 id="displayName">Jane Doe</h1>
+          <h1 id="displayName">{{ user.display_name or "New Member" }}</h1>
 
           <p>
             <strong>Age:</strong>
-            <span id="displayAge">24</span>
+            <span id="displayAge">{{ user.age }}</span>
           </p>
 
           <p>
             <strong>Location:</strong>
-            <span id="displayLocation">Perth, Australia</span>
+            <span id="displayLocation">{{ user.location_text or "Not set" }}</span>
           </p>
 
           <p>
             <strong>Interests:</strong>
-            <span id="displayInterests">Music, Movies, Fitness, Cooking</span>
+            <span id="displayInterests">
+              {% for interest in user.interests %}
+                {{ interest.name }}{% if not loop.last %}, {% endif %}
+              {% else %}
+                No interests selected
+              {% endfor %}
+            </span>
           </p>
           
           <p>
               <strong>Gender:</strong>
-              <span id="displayGender">Not specified</span>
+              <span id="displayGender">{{ user.gender }}</span>
           </p>
 
           <p id="orientationContainer">
               <strong>Orientation:</strong>
-              <span id="displayOrientation">Not specified</span>
+              <span id="displayOrientation">{{ user.orientation }}</span>
           </p>
 
           <p>
             <strong>Bio:</strong>
-            <span id="displayBio">
-              I love coffee, music, traveling, and meeting new people!
-            </span>
+            <span id="displayBio">{{ user.bio or "No bio yet..." }}</span>
           </p>
 
           <button id="editProfileBtn" class="btn btn-primary mb-3" type="button">
             Edit Profile
           </button>
         </div>
+
       </div>
 
       <div id="profileModal" class="profile-modal">
-        <form id="profileForm" class="profile-popup" method="POST" action="/update-profile">
-          <button
-            id="closeProfile"
-            class="close"
-            type="button"
-            aria-label="Close profile form"
-          >
+        <form id="profileForm" class="profile-popup" action="{{ url_for('profile') }}" method="POST">
+          <button id="closeProfile" class="close" type="button" aria-label="Close profile form">
             &times;
           </button>
 
           <h1>Edit Profile</h1>
 
           <label for="nameInput">Name:</label>
-          <input type="text" id="nameInput" name="display_name" value="Jane Doe">
+          <input type="text" id="nameInput" name="name" value="{{ user.display_name or '' }}">
 
           <label for="ageInput">Age:</label>
-          <input type="number" id="ageInput" name="age" value="24">
+          <input type="number" id="ageInput" name="age" value="{{ user.age or '' }}">
 
           <label for="locationInput">Location:</label>
-          <input id="locationInput" name="location_text" type="text" value="Perth WA, Australia">
-          <input id="locationPlaceId" name="place_id" type="hidden">
+          <input id="locationInput" name="location_text" type="text" value="{{ user.location_text or '' }}">
+          <input id="locationPlaceId" name="place_id" type="hidden" value="{{ user.place_id or '' }}">
           
           <label>Interests:</label>
           <div class="interests-container">
@@ -112,35 +111,39 @@
                 <input type="checkbox" 
                       class="interest-checkbox" 
                       name="interest" 
-                      value="{{ interest }}" 
-                      id="int{{ interest }}"
+                      value="{{ interest.name }}" 
+                      id="int{{ interest.id }}"
                       {% if interest in user.interests %}checked{% endif %}>
-                <label for="int{{ interest }}">{{ interest }}</label>
+                <label for="int{{ interest.id }}">{{ interest.name }}</label>
             </div>
             {% endfor %}
           </div>
 
           <label for="genderInput">Gender:</label>
           <select id="genderInput" name="gender">
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
+              <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+              <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+              <option value="Not Specified" {% if not user.gender or user.gender == 'Not Specified' %}selected{% endif %}>Not Specified</option>
           </select>
 
           <label for="orientationInput">Sexual Orientation:</label>
           <select id="orientationInput" name="orientation">
-              <option value="Straight">Straight</option>
-              <option value="Gay">Gay</option>
-              <option value="Lesbian">Lesbian</option>
-              <option value="Other">Other</option>
+              <option value="Straight" {% if user.orientation == 'Straight' %}selected{% endif %}>Straight</option>
+              <option value="Gay" {% if user.orientation == 'Gay' %}selected{% endif %}>Gay</option>
+              <option value="Lesbian" {% if user.orientation == 'Lesbian' %}selected{% endif %}>Lesbian</option>
+              <option value="Other" {% if user.orientation == 'Other' %}selected{% endif %}>Other</option>
+              <option value="Not Specified" {% if not user.orientation or user.orientation == 'Not Specified' %}selected{% endif %}>Not Specified</option>
           </select>
 
           <label for="bioInput">Bio:</label>
-          <textarea id="bioInput" name="bio">I love coffee, music, traveling, and meeting new people.</textarea>
+          <textarea id="bioInput" name="bio">{{ user.bio or '' }}</textarea>
+          
           <button type="submit" class="btn btn-success">Save</button>
         </form>
       </div>
     </section>
+
 
     <section class="story-section container">
       <h1 class="text-center">My Story</h1>
@@ -199,7 +202,6 @@
       </div>
 
       <div id="storyModal" class="profile-modal">
-        <!-- Added method, action, and enctype -->
         <form id="storyForm" class="profile-popup" method="POST" action="/update-story" enctype="multipart/form-data">
           <button
             id="closeStory"

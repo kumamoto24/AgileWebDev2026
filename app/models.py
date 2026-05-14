@@ -46,15 +46,15 @@ class Profile(db.Model):
         nullable=False
     )
 
-    display_name = db.Column(db.String(80), nullable=False)
+    display_name = db.Column(db.String(80))
     bio = db.Column(db.Text)
-    age = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(30), nullable=False)
-    orientation = db.Column(db.String(30), nullable=False)
-    location_text = db.Column(db.String(120), index=True,nullable=False)
-    latitude = db.Column(db.Float,nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
-    place_id = db.Column(db.String(128), nullable=False)
+    age = db.Column(db.Integer)
+    gender = db.Column(db.String(30))
+    orientation = db.Column(db.String(30))
+    location_text = db.Column(db.String(120), index=True)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    place_id = db.Column(db.String(128))
 
     profile_image_path = db.Column(db.String(255))
 
@@ -84,6 +84,24 @@ class Profile(db.Model):
         order_by="Story.display_order"
     )
 
+    @property
+    def is_complete(self):
+        required_fields = [
+            self.display_name,
+            self.age,
+            self.gender,
+            self.orientation,
+            self.location_text,
+            self.latitude,
+            self.longitude,
+            self.place_id,
+        ]
+
+        return all(field is not None and field != "" for field in required_fields) and len(self.interests) > 0
+
+    @property
+    def like_count(self):
+        return Likes.query.filter_by(liked_id=self.id).count()
 
 class Interest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -202,4 +220,44 @@ class Message(db.Model):
     created_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc)
+    )
+
+# Add Likes table to store like relationships between users
+# In this project, user.id strictly equals to profile.id, and is a one-to-one relationship
+class Likes(db.Model):
+    __tablename__ = "likes"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    # The profile/user who sends the like
+    liker_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    # The profile/user who receives the like
+    liked_id = db.Column(
+        db.Integer,
+        db.ForeignKey("profile.id"),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "liker_id",
+            "liked_id",
+            name="uq_like_pair"
+        ),
+        db.CheckConstraint(
+            "liker_id != liked_id",
+            name="ck_no_self_like"
+        ),
+        db.Index("ix_likes_liker_id", "liker_id"),
+        db.Index("ix_likes_liked_id", "liked_id"),
     )
