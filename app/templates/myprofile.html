@@ -39,6 +39,17 @@
             form="profileForm"
             hidden
           >
+          <div class="mt-3">
+            <a 
+              href="{{ url_for('matches') }}" 
+              class="btn-like"
+            >
+              Likes received❤️:
+              <span id="displayLikeCount">
+                {{ user.like_count if user else 0 }}
+              </span>
+            </a>
+          </div>
         </div>
         <div id="profileDisplay" class="col-md-8 basic-info">
           <h1 id="displayName">{{ user.display_name or "New Member" }}</h1>

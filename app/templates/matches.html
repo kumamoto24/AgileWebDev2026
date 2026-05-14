@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}HeartLink | Matches{% endblock %}
+
+{% block extra_head %}
+<style>
+  body {
+    background-color: #f8f6f7;
+    font-family: Arial, sans-serif;
+  }
+
+  .matches-header {
+    background: linear-gradient(135deg, #f3c6d8, #ffffff);
+    border-radius: 20px;
+    padding: 35px;
+    margin-top: 30px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+
+  <section class="matches-header">
+    <h2 class="fw-bold">People Who Liked You</h2>
+    <p class="text-muted mb-0">
+      These users have liked your profile.
+    </p>
+  </section>
+
+  <section class="mt-5">
+    <h4 class="fw-bold mb-4">Your Matches</h4>
+
+    <div class="row g-4" id="likedYouList">
+      <p>Loading profiles...</p>
+    </div>
+  </section>
+
+  <section class="mt-5">
+    <h4 class="fw-bold mb-4">People You Liked</h4>
+    <div class="row g-4" id="youLikedList">
+        <p>Loading profiles...</p>
+    </div>
+  </section>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/matches.js') }}"></script>
+{% endblock %}
