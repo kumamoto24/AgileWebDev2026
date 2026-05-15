@@ -17,6 +17,29 @@ from functools import wraps
 # Interest list (global)
 all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
 
+AGE_RANGES = [
+    {"label": "18-24", "min": 18, "max": 24},
+    {"label": "25-34", "min": 25, "max": 34},
+    {"label": "35-44", "min": 35, "max": 44},
+    {"label": "45-54", "min": 45, "max": 54},
+    {"label": "55+", "min": 55, "max": None},
+]
+
+
+def is_allowed_age_range(min_age, max_age):
+    if min_age is None and max_age is None:
+        return True
+
+    for age_range in AGE_RANGES:
+        matching_min_age = age_range["min"] == min_age
+        matching_max_age = age_range["max"] == max_age
+
+        if matching_min_age and matching_max_age:
+            return True
+
+    return False
+
+
 #Helper function: Load image
 def build_profile_image_url(image_path):
     if not image_path:
@@ -248,6 +271,7 @@ def home():
         username=username,
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         interests_list=all_interests,
+        age_ranges=AGE_RANGES,
         is_logged_in=True
     )
 
@@ -436,6 +460,12 @@ def search_profiles():
     search_latitude = request.args.get("latitude", type=float)
     search_longitude = request.args.get("longitude", type=float)
     radius_km = request.args.get("radius_km", default=10, type=float)
+    min_age = request.args.get("min_age", type=int)
+    max_age = request.args.get("max_age", type=int)
+
+    if not is_allowed_age_range(min_age, max_age):
+        min_age = None
+        max_age = None
 
     current_profile = current_user.profile
 
@@ -465,6 +495,12 @@ def search_profiles():
             .filter(Interest.name.in_(selected_interests))
             .distinct()
         )
+
+    if min_age is not None:
+        query = query.filter(Profile.age >= min_age)
+
+    if max_age is not None:
+        query = query.filter(Profile.age <= max_age)
 
     candidate_profiles = query.all()
 

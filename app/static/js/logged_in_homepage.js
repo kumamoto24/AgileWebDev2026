@@ -17,6 +17,7 @@ async function searchProfiles() {
     const locationPlaceIdInput = document.getElementById("locationPlaceIdInput");
     const locationLatitudeInput = document.getElementById("locationLatitudeInput");
     const locationLongitudeInput = document.getElementById("locationLongitudeInput");
+    const selectedAgeRange = getSelectedAgeRange();
     const selectedInterests = getSelectedInterests();
 
     const location = locationInput.value;
@@ -35,6 +36,14 @@ async function searchProfiles() {
     latitude: latitude,
     longitude: longitude
     });
+
+    if (selectedAgeRange.minAge) {
+      queryString.append("min_age", selectedAgeRange.minAge);
+    }
+
+    if (selectedAgeRange.maxAge) {
+      queryString.append("max_age", selectedAgeRange.maxAge);
+    }
 
     selectedInterests.forEach(interest => {
       queryString.append("interests", interest);
@@ -102,6 +111,24 @@ function getSelectedInterests() {
     .map(checkbox => checkbox.value);
 }
 
+function getSelectedAgeRange() {
+  const ageRangeInput = document.getElementById("ageRangeInput");
+
+  if (!ageRangeInput || !ageRangeInput.value) {
+    return {
+      minAge: "",
+      maxAge: ""
+    };
+  }
+
+  const [minAge, maxAge] = ageRangeInput.value.split("|");
+
+  return {
+    minAge: minAge || "",
+    maxAge: maxAge || ""
+  };
+}
+
 function updateInterestDropdownLabel() {
   const interestDropdownButton = document.getElementById("interestDropdownButton");
   const selectedInterests = getSelectedInterests();
@@ -115,8 +142,16 @@ function updateInterestDropdownLabel() {
   } else if (selectedInterests.length === 1) {
     interestDropdownButton.textContent = selectedInterests[0];
   } else {
-    interestDropdownButton.textContent = `${selectedInterests.length} interests selected`;
+    interestDropdownButton.textContent = `${selectedInterests.length} selected`;
   }
+}
+
+function resetSelectedInterests() {
+  document.querySelectorAll(".interest-checkbox:checked").forEach(checkbox => {
+    checkbox.checked = false;
+  });
+
+  updateInterestDropdownLabel();
 }
 
 async function initLocationAutocomplete() {
@@ -185,9 +220,15 @@ async function initLocationAutocomplete() {
 window.initLocationAutocomplete = initLocationAutocomplete;
 
 document.addEventListener("DOMContentLoaded", function () {
+  const resetInterestsButton = document.getElementById("resetInterestsButton");
+
   document.querySelectorAll(".interest-checkbox").forEach(checkbox => {
     checkbox.addEventListener("change", updateInterestDropdownLabel);
   });
+
+  if (resetInterestsButton) {
+    resetInterestsButton.addEventListener("click", resetSelectedInterests);
+  }
 
   updateInterestDropdownLabel();
   loadRecommendedProfiles();
