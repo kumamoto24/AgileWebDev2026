@@ -382,10 +382,12 @@ storyForm.addEventListener("submit", async (event) => {
 
   // --- 2. Prepare Data for Backend ---
   // Using FormData because it handles file uploads (images) automatically
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
   const formData = new FormData();
   formData.append("title", titleValue);
   formData.append("description", descValue);
   formData.append("display_order", storyOrderInput.value);
+  formData.append("csrf_token", csrfToken || "");
   
   // Get the file from input
   const file = storyPicInput.files[0];

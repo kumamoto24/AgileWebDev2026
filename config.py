@@ -16,6 +16,10 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-        # Google reCAPTCHA
+    # CSRF Protection
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_CHECK_DEFAULT = True
+
+    # Google reCAPTCHA
     RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY")
     RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY")

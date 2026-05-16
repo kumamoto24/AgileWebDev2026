@@ -179,6 +179,7 @@ block extra_head %}
       {% endif %}
 
       <form class="signup-form" action="{{ url_for('signup') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div class="input-group">
           <input
