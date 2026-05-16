@@ -787,7 +787,14 @@ def update_story():
     "image_url": build_story_image_url(story.image_path)
 }), 200
 
-
+@app.route("/matches")
+@login_required
+@profile_required
+def matches():
+    return render_template(
+        "matches.html",
+        is_logged_in=True
+    )
 
 @app.route("/api/matches")
 @login_required
