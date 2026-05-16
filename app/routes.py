@@ -238,7 +238,25 @@ def profile_required(view_func):
 def get_feature_profile():
     featured_profiles = (
         Profile.query
-        .order_by(db.func.random())
+        .outerjoin(Likes, Likes.liked_id == Profile.id)
+        .filter(
+            Profile.display_name.isnot(None),
+            Profile.display_name != "",
+            Profile.age.isnot(None),
+            Profile.gender.isnot(None),
+            Profile.gender != "",
+            Profile.orientation.isnot(None),
+            Profile.orientation != "",
+            Profile.location_text.isnot(None),
+            Profile.location_text != "",
+            Profile.latitude.isnot(None),
+            Profile.longitude.isnot(None),
+            Profile.place_id.isnot(None),
+            Profile.place_id != "",
+            Profile.interests.any(),
+        )
+        .group_by(Profile.id)
+        .order_by(db.func.count(Likes.id).desc(), Profile.id.asc())
         .limit(3)
         .all())
     return [profile_to_card(profile) for profile in featured_profiles]
