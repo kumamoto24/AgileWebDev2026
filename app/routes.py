@@ -694,35 +694,39 @@ def handle_like(profile_id):
     return jsonify({"status": "error", "message": "Invalid like action."}), 400
 
 
-@app.route("/profile/update", methods=["POST"])
+@app.route("/profile/image", methods=["POST"])
 @login_required
-def update_profile():
+def update_profile_image():
     profile = current_user.profile
+
     if not profile:
         profile = Profile(user_id=current_user.id)
         db.session.add(profile)
+        db.session.flush()
 
-    profile.display_name = request.form.get("display_name")
-    profile.age = request.form.get("age", type=int)
-    profile.gender = request.form.get("gender")
-    profile.orientation = request.form.get("orientation")
-    profile.location_text = request.form.get("location_text")
-    profile.latitude = request.form.get("latitude", type=float)
-    profile.longitude = request.form.get("longitude", type=float)
-    profile.place_id = request.form.get("place_id")
-    profile.bio = request.form.get("bio")
+    image_file = request.files.get("profilePicture")
 
-    submitted_interests = request.form.getlist("interest")
-    profile.interests = []
-    for name in submitted_interests:
-        interest_obj = Interest.query.filter_by(name=name).first()
-        if interest_obj:
-            profile.interests.append(interest_obj)
+    if not image_file or not image_file.filename:
+        return jsonify({
+            "status": "error",
+            "message": "No profile image was uploaded."
+        }), 400
+
+    filename = secure_filename(image_file.filename)
+    upload_subdir = "uploads/profile_images"
+    upload_folder = os.path.join(current_app.static_folder, upload_subdir)
+    os.makedirs(upload_folder, exist_ok=True)
+
+    image_file.save(os.path.join(upload_folder, filename))
+    profile.profile_image_path = f"{upload_subdir}/{filename}"
 
     db.session.commit()
-    return redirect(url_for("profile"))
 
-
+    return jsonify({
+        "status": "success",
+        "profile_image_path": profile.profile_image_path,
+        "profile_image_url": build_profile_image_url(profile.profile_image_path)
+    }), 200
 
 
 @app.route("/update-story", methods=["POST"])
@@ -784,17 +788,6 @@ def update_story():
 }), 200
 
 
-
-
-# '/matches' to be deleted
-@app.route("/matches")
-@login_required
-@profile_required
-def matches():
-    return render_template(
-        "matches.html",
-        is_logged_in=True
-    )
 
 @app.route("/api/matches")
 @login_required
