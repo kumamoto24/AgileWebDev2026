@@ -43,7 +43,7 @@ def get_current_profile():
     if not user_id:
         return None
 
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
 
     if not user:
         return None
@@ -56,7 +56,7 @@ def profile_room(profile_id):
 
 
 def serialize_message(message):
-    sender = Profile.query.get(message.sender_profile_id)
+    sender = db.session.get(Profile, message.sender_profile_id)
 
     return {
         "id": message.id,
@@ -91,7 +91,7 @@ def handle_chat_join(data):
     if not recipient_id:
         return
 
-    recipient = Profile.query.get(recipient_id)
+    recipient = db.session.get(Profile, recipient_id)
 
     if not recipient:
         return
@@ -134,7 +134,7 @@ def handle_send_message(data):
     if len(body) > 1000:
         body = body[:1000]
 
-    recipient = Profile.query.get(recipient_id)
+    recipient = db.session.get(Profile, recipient_id)
 
     if not recipient:
         return

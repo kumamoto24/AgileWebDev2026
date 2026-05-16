@@ -807,7 +807,7 @@ def api_matches():
     liker = []
 
     for like in likes:
-        liker_profile = Profile.query.get(like.liker_id)
+        liker_profile = db.session.get(Profile, like.liker_id)
 
         if liker_profile:
             liker.append(profile_to_card(liker_profile))
@@ -820,7 +820,7 @@ def api_matches():
     liked = []
 
     for like in liked_likes:
-        liked_profile = Profile.query.get(like.liked_id)
+        liked_profile = db.session.get(Profile, like.liked_id)
 
         if liked_profile:
             liked.append(profile_to_card(liked_profile))
