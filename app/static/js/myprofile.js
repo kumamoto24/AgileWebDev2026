@@ -78,114 +78,6 @@ async function verifyLocationManually(text) {
     }
 }
 
-// profileForm.addEventListener("submit", async (event) => {
-//   event.preventDefault();
-
-//   // --- 1. Name Validation (Syntax Fixed) ---
-//   const nameValue = nameInput.value.trim();
-//   if (!nameValue) {
-//     alert("Name cannot be blank.");
-//     return;
-//   }
-
-//   // Pattern allows letters, spaces, hyphens, and apostrophes
-//   const nameRegex = /^[A-Za-z\s\-']+$/;
-//   if (!nameRegex.test(nameValue)) {
-//     alert("Name can only contain letters, spaces, hyphens, and apostrophes.");
-//     return;
-//   }
-
-//   if (nameValue.length < 2) {
-//     alert("Name must be at least 2 characters long.");
-//     return;
-//   }
-
-//   // --- 2. Age Check ---
-//   if (Number(ageInput.value) < 18) {
-//     alert("Age must be 18 or above.");
-//     return;
-//   }
-
-//   // --- 3. Location Validation (Async) ---
-//   const locIdInput = document.getElementById("locationPlaceIdInput"); 
-//   let placeId = locIdInput ? locIdInput.value : null;
-
-//   // Manual verification if user typed a city but didn't click a suggestion
-//   if (!placeId && locationInput.value.trim()) {
-//       const verified = await verifyLocationManually(locationInput.value.trim());
-//       if (verified) {
-//           if (locIdInput) locIdInput.value = verified.place_id;
-//           locationInput.value = verified.description;
-//           placeId = verified.place_id;
-//       }
-//   }
-
-//   if (!placeId) {
-//       alert("Please select a valid city in Australia from the suggestions.");
-//       return;
-//   }
-
-//   // --- 4. Gender and Orientation ---
-//   if (!genderInput.value || !orientationInput.value) {
-//     alert("Please select your Gender and Sexual Orientation.");
-//     return;
-//   }
-
-//   // --- 5. Interests ---
-//   const selectedInterests = Array.from(document.querySelectorAll('.interest-checkbox:checked')).map(cb => cb.value);
-//   if (selectedInterests.length === 0) {
-//     alert("Please select at least one interest.");
-//     return;
-//   }
-
-//   // --- 6. Bio Word Count ---
-//   const bioValue = bioInput.value.trim();
-//   const bioWordCount = bioValue.split(/\s+/).filter(Boolean).length;
-//   if (bioWordCount > 1000) {
-//     alert("Bio must be 1000 words or less.");
-//     return;
-//   }
-
-//   // --- Success: Update UI Display ---
-//   displayName.textContent = nameValue;
-//   displayAge.textContent = ageInput.value;
-//   displayLocation.textContent = locationInput.value;
-//   displayInterests.textContent = selectedInterests.join(", ");
-//   displayGender.textContent = genderInput.value;
-//   displayOrientation.textContent = orientationInput.value;
-//   displayBio.textContent = bioValue;
-
-//   // Handle Orientation visibility
-//   const showOrientationInput = document.getElementById("showOrientationInput");
-//   if (showOrientationInput && orientationContainer) {
-//       orientationContainer.style.display = showOrientationInput.checked ? "block" : "none";
-//   }
-
-
-//   const profileData = { name: nameValue, interests: selectedInterests /* etc */ };
-
-//   try {
-//       const response = await fetch("/profile/update", {
-//           method: "POST",
-//           headers: { "Content-Type": "application/json" },
-//           body: JSON.stringify(profileData)
-//       });
-
-//       if (response.ok) {
-//           // 3. ONLY IF SUCCESSFUL: Update UI and close modal
-//           displayName.textContent = nameValue;
-//           displayInterests.textContent = selectedInterests.join(", ");
-          
-//           profileModal.style.display = "none"; // Close here!
-//           alert("Profile updated!");
-//       } else {
-//           alert("Server error. Your changes were not saved.");
-//       }
-//   } catch (error) {
-//       alert("Network error. Please check your connection.");
-//   }
-// });
-
 profileForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -292,20 +184,38 @@ function initAutocomplete() {
 const profilePicInput = document.getElementById("profilePicInput");
 const profileImage = document.querySelector(".myprofile-img");
 
-profilePicInput.addEventListener("change", function () {
+profilePicInput.addEventListener("change", async function () {
   const file = this.files[0];
 
   if (!file) {
     return;
   }
 
-  const reader = new FileReader();
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+  const formData = new FormData();
+  formData.append("profilePicture", file);
+  formData.append("csrf_token", csrfToken || "");
 
-  reader.onload = function (event) {
-    profileImage.src = event.target.result;
-  };
+  try {
+    const response = await fetch("/profile/image", {
+      method: "POST",
+      body: formData
+    });
 
-  reader.readAsDataURL(file);
+    if (!response.ok) {
+      alert("Failed to upload profile picture.");
+      return;
+    }
+
+    const result = await response.json();
+
+    if (result.profile_image_url) {
+      profileImage.src = result.profile_image_url;
+    }
+  } catch (error) {
+    console.error("Profile image upload error:", error);
+    alert("Network error. Please check your connection and try again.");
+  }
 });
 
 
@@ -437,4 +347,3 @@ storyForm.addEventListener("submit", async (event) => {
     alert("Network error. Please check your connection and try again.");
   }
 });
-
