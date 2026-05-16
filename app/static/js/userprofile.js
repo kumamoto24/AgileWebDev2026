@@ -11,11 +11,13 @@ function toggleLike(profileId) {
     likeBtn.textContent = isLiked ? '❤️ Liked' : '🤍 Like';
 
     // 2. Send the data
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
     fetch(`/profile/${profileId}/like`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            // If using Flask, you might need the X-CSRFToken header here
+            'X-CSRFToken': csrfToken || ''
         },
         body: JSON.stringify({ 
             profile_id: profileId, // Explicitly tell the backend which ID
