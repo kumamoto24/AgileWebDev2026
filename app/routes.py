@@ -787,7 +787,14 @@ def update_story():
     "image_url": build_story_image_url(story.image_path)
 }), 200
 
-
+@app.route("/matches")
+@login_required
+@profile_required
+def matches():
+    return render_template(
+        "matches.html",
+        is_logged_in=True
+    )
 
 @app.route("/api/matches")
 @login_required
@@ -800,7 +807,7 @@ def api_matches():
     liker = []
 
     for like in likes:
-        liker_profile = Profile.query.get(like.liker_id)
+        liker_profile = db.session.get(Profile, like.liker_id)
 
         if liker_profile:
             liker.append(profile_to_card(liker_profile))
@@ -813,7 +820,7 @@ def api_matches():
     liked = []
 
     for like in liked_likes:
-        liked_profile = Profile.query.get(like.liked_id)
+        liked_profile = db.session.get(Profile, like.liked_id)
 
         if liked_profile:
             liked.append(profile_to_card(liked_profile))
