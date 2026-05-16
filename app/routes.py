@@ -753,7 +753,7 @@ def update_story():
         os.makedirs(upload_folder, exist_ok=True)
 
         image_file.save(os.path.join(upload_folder, filename))
-        story.image_path = os.path.join(upload_subdir, filename)
+        story.image_path = f"{upload_subdir}/{filename}" # Fix image upload bug on Windows OS
 
     db.session.commit()
 
