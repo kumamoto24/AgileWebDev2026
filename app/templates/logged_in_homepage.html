@@ -37,6 +37,22 @@
       font-weight: 700;
       margin: 8px 0 4px;
     }
+
+    .interest-filter-header {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .interest-reset-button {
+      border: 0;
+      background: transparent;
+      color: #7b2c4d;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 4px 0;
+    }
   </style>
 {% endblock %}
 
@@ -53,7 +69,7 @@
       <h4 class="fw-bold mb-3">Search for Matches</h4>
 
       <div class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <input
             type="text"
             id="keywordInput"
@@ -87,7 +103,18 @@
           name="longitude" />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
+          <select id="ageRangeInput" class="form-select" aria-label="Age range">
+            <option value="">Any age</option>
+            {% for age_range in age_ranges %}
+              <option value="{{ age_range['min'] }}|{{ age_range['max'] or '' }}">
+                {{ age_range["label"] }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2">
           <div class="dropdown">
             <button
               class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
@@ -104,65 +131,30 @@
               class="dropdown-menu w-100 interest-dropdown-menu"
               aria-labelledby="interestDropdownButton"
             >
-              <div class="interest-category-title">Creative</div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Music" id="interestMusic" />
-                <label class="form-check-label" for="interestMusic">Music</label>
+              <div class="interest-filter-header">
+                <div class="interest-category-title">Interests</div>
+                <button
+                  type="button"
+                  class="interest-reset-button"
+                  id="resetInterestsButton"
+                >
+                  Reset
+                </button>
               </div>
 
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Movies" id="interestMovies" />
-                <label class="form-check-label" for="interestMovies">Movies</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Art" id="interestArt" />
-                <label class="form-check-label" for="interestArt">Art</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Photography" id="interestPhotography" />
-                <label class="form-check-label" for="interestPhotography">Photography</label>
-              </div>
-
-              <div class="dropdown-divider"></div>
-
-              <div class="interest-category-title">Lifestyle</div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Travel" id="interestTravel" />
-                <label class="form-check-label" for="interestTravel">Travel</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Fitness" id="interestFitness" />
-                <label class="form-check-label" for="interestFitness">Fitness</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Food" id="interestFood" />
-                <label class="form-check-label" for="interestFood">Food</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Reading" id="interestReading" />
-                <label class="form-check-label" for="interestReading">Reading</label>
-              </div>
-
-              <div class="dropdown-divider"></div>
-
-              <div class="interest-category-title">Social</div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Gaming" id="interestGaming" />
-                <label class="form-check-label" for="interestGaming">Gaming</label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input interest-checkbox" type="checkbox" value="Dancing" id="interestDancing" />
-                <label class="form-check-label" for="interestDancing">Dancing</label>
-              </div>
+              {% for interest in interests_list %}
+                <div class="form-check">
+                  <input
+                    class="form-check-input interest-checkbox"
+                    type="checkbox"
+                    value="{{ interest }}"
+                    id="interest{{ loop.index }}"
+                  />
+                  <label class="form-check-label" for="interest{{ loop.index }}">
+                    {{ interest }}
+                  </label>
+                </div>
+              {% endfor %}
             </div>
           </div>
         </div>

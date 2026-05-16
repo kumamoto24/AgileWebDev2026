@@ -39,6 +39,17 @@
             form="profileForm"
             hidden
           >
+          <div class="mt-3">
+            <a 
+              href="{{ url_for('matches') }}" 
+              class="btn-like"
+            >
+              Likes received❤️:
+              <span id="displayLikeCount">
+                {{ user.like_count if user else 0 }}
+              </span>
+            </a>
+          </div>
         </div>
         <div id="profileDisplay" class="col-md-8 basic-info">
           <h1 id="displayName">{{ user.display_name or "New Member" }}</h1>
@@ -96,13 +107,15 @@
           <h1>Edit Profile</h1>
 
           <label for="nameInput">Name:</label>
-          <input type="text" id="nameInput" name="name" value="{{ user.display_name or '' }}">
+          <input type="text" id="nameInput" name="display_name" value="{{ user.display_name or '' }}">
 
           <label for="ageInput">Age:</label>
           <input type="number" id="ageInput" name="age" value="{{ user.age or '' }}">
 
           <label for="locationInput">Location:</label>
           <input id="locationInput" name="location_text" type="text" value="{{ user.location_text or '' }}">
+          <input type="hidden" id="locationLatitude" name="latitude" value="{{ user.latitude or '' }}">
+          <input type="hidden" id="locationLongitude" name="longitude" value="{{ user.longitude or '' }}">
           <input id="locationPlaceId" name="place_id" type="hidden" value="{{ user.place_id or '' }}">
           
           <label>Interests:</label>
@@ -153,53 +166,30 @@
       </p>
 
       <div class="row justify-content-center g-4">
+        {% for story in story_slots %}
         <div class="col-md-4">
-          <div class="card h-100 story-card" role="button" tabindex="0">
+          <div
+            class="card h-100 story-card {% if story.is_empty %}story-card-empty{% endif %}"
+            role="button"
+            tabindex="0"
+            data-story-order="{{ story.display_order }}"
+            data-story-title="{% if not story.is_empty %}{{ story.title|e }}{% endif %}"
+            data-story-description="{% if not story.is_empty %}{{ (story.description or '')|e }}{% endif %}"
+          >
             <img
-              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&h=420&fit=crop"
+              src="{{ story.image_url }}"
               class="card-img-top story-img"
-              alt="Beach story"
+              alt="{{ story.title }} story"
             >
             <div class="card-body text-center">
-              <h5 class="card-title story-title">Beach Day</h5>
+              <h5 class="card-title story-title">{{ story.title }}</h5>
               <p class="card-text story-description">
-                (Example) A day at the beach.
+                {{ story.description or "No description yet." }}
               </p>
             </div>
           </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="card h-100 story-card" role="button" tabindex="0">
-            <img
-              src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=640&h=420&fit=crop"
-              class="card-img-top story-img"
-              alt="Coffee story"
-            >
-            <div class="card-body text-center">
-              <h5 class="card-title story-title">Coffee Date</h5>
-              <p class="card-text story-description">
-                (Example) Coffee date vibes.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card h-100 story-card" role="button" tabindex="0">
-            <img
-              src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=640&h=420&fit=crop"
-              class="card-img-top story-img"
-              alt="Sydney Opera House story"
-            >
-            <div class="card-body text-center">
-              <h5 class="card-title story-title">Opera House</h5>
-              <p class="card-text story-description">
-                (Example) Opera House sightseeing.
-              </p>
-            </div>
-          </div>
-        </div>
+        {% endfor %}
       </div>
 
       <div id="storyModal" class="profile-modal">

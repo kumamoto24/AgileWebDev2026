@@ -5,13 +5,40 @@ import os
 
 
 from sqlalchemy import or_
-from app.models import Profile, Interest, User, Likes
+from app.models import Profile, Interest, User, Likes, Story, Conversation
 
 from math import radians, sin, cos, sqrt, atan2
 
 from flask_login import login_user, login_required, current_user, logout_user
+from werkzeug.utils import secure_filename
 import requests
 from functools import wraps
+
+# Interest list (global)
+all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
+
+AGE_RANGES = [
+    {"label": "18-24", "min": 18, "max": 24},
+    {"label": "25-34", "min": 25, "max": 34},
+    {"label": "35-44", "min": 35, "max": 44},
+    {"label": "45-54", "min": 45, "max": 54},
+    {"label": "55+", "min": 55, "max": None},
+]
+
+
+def is_allowed_age_range(min_age, max_age):
+    if min_age is None and max_age is None:
+        return True
+
+    for age_range in AGE_RANGES:
+        matching_min_age = age_range["min"] == min_age
+        matching_max_age = age_range["max"] == max_age
+
+        if matching_min_age and matching_max_age:
+            return True
+
+    return False
+
 
 #Helper function: Load image
 def build_profile_image_url(image_path):
@@ -59,6 +86,37 @@ def build_story_image_url(image_path):
 
     return url_for("static", filename=filename)
 
+def build_story_slots(stories, slot_count=3):
+    stories_by_order = {}
+
+    for story in stories:
+        if story.display_order and 1 <= story.display_order <= slot_count:
+            stories_by_order[story.display_order] = story
+
+
+    story_slots = []
+    for display_order in range(1, slot_count + 1):
+        story = stories_by_order.get(display_order)
+
+        if story:
+            story_slots.append({
+                "title": story.title,
+                "description": story.description,
+                "image_url": build_story_image_url(story.image_path),
+                "display_order": display_order,
+                "is_empty": False,
+            })
+        else:
+            story_slots.append({
+                "title": "Add Story",
+                "description": "Share a moment from your life.",
+                "image_url": build_story_image_url(None),
+                "display_order": display_order,
+                "is_empty": True,
+            })
+
+    return story_slots
+
 #Helper function: Convert progiles to cards
 def profile_to_card(profile, distance=None, match_score=None):
     return {
@@ -93,8 +151,6 @@ def calculate_distance_km(lat1, lon1, lat2, lon2):
 
     return round(earth_radius_km * c, 1)
 
-# Interest list (global)
-all_interests = ["Sports","Music","Movies","Travel","Gaming","Reading","Cooking","Fitness","Art","Technology"]
 
 # Helper function: filter compatible recommended candidate
 def compatible(current_profile, candidate):
@@ -214,6 +270,8 @@ def home():
         "logged_in_homepage.html",
         username=username,
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
+        interests_list=all_interests,
+        age_ranges=AGE_RANGES,
         is_logged_in=True
     )
 
@@ -323,11 +381,6 @@ def signup():
 @login_required
 @profile_required
 def recommended_profiles():
-    '''
-    # Temporary: use the first profile as the current user profile (login has not been developed)
-    current_profile = Profile.query.first()
-    '''
-
 
     if not current_user.is_authenticated:
         return jsonify([])
@@ -407,6 +460,12 @@ def search_profiles():
     search_latitude = request.args.get("latitude", type=float)
     search_longitude = request.args.get("longitude", type=float)
     radius_km = request.args.get("radius_km", default=10, type=float)
+    min_age = request.args.get("min_age", type=int)
+    max_age = request.args.get("max_age", type=int)
+
+    if not is_allowed_age_range(min_age, max_age):
+        min_age = None
+        max_age = None
 
     current_profile = current_user.profile
 
@@ -436,6 +495,12 @@ def search_profiles():
             .filter(Interest.name.in_(selected_interests))
             .distinct()
         )
+
+    if min_age is not None:
+        query = query.filter(Profile.age >= min_age)
+
+    if max_age is not None:
+        query = query.filter(Profile.age <= max_age)
 
     candidate_profiles = query.all()
 
@@ -520,11 +585,14 @@ def profile():
     
     # 4. HANDLE GET (Displaying data)
     all_interests = Interest.query.all()
+    story_slots = build_story_slots(user_profile.stories if user_profile else [])
     
     return render_template(
         "myprofile.html",
         interests_list=all_interests,
         user=user_profile, 
+        story_slots=story_slots,
+        profile_image_url=build_profile_image_url(user_profile.profile_image_path if user_profile else None),
         google_maps_api_key=current_app.config.get("GOOGLE_MAPS_API_KEY", ""),
         is_logged_in=True
     )
@@ -637,21 +705,158 @@ def update_profile():
     return redirect(url_for("profile"))
 
 
-@app.route("/story/update", methods=["POST"])
+
+
+@app.route("/update-story", methods=["POST"])
+@login_required
 def update_story():
-    title = request.form.get("title")
-    description = request.form.get("description")
-    image_file = request.files.get("story_image")
-    
-    # Validation and save logic...
-    return jsonify({"status": "success"}), 200
+    profile = current_user.profile
+
+    if not profile:
+        profile = Profile(user_id=current_user.id)
+        db.session.add(profile)
+        db.session.flush()
+
+    display_order = request.form.get("display_order", type=int)
+
+    if display_order not in [1, 2, 3]:
+        return jsonify({
+            "status": "error",
+            "message": "Invalid story slot."
+        }), 400
+
+    story = Story.query.filter_by(
+        profile_id=profile.id,
+        display_order=display_order
+    ).first()
+
+    if not story:
+        story = Story(
+            profile_id=profile.id,
+            display_order=display_order,
+            image_path="images/default-story.jpg"
+        )
+        db.session.add(story)
+
+    story.title = request.form.get("title") or "Untitled Story"
+    story.description = request.form.get("description")
+
+    image_file = request.files.get("image_path")
+
+    if image_file and image_file.filename:
+        filename = secure_filename(image_file.filename)
+        upload_subdir = "uploads/story_images"
+        upload_folder = current_app.config.get(
+            "UPLOAD_FOLDER",
+            os.path.join(current_app.static_folder, upload_subdir)
+        )
+        os.makedirs(upload_folder, exist_ok=True)
+
+        image_file.save(os.path.join(upload_folder, filename))
+        story.image_path = os.path.join(upload_subdir, filename)
+
+    db.session.commit()
+
+    return jsonify({
+    "status": "success",
+    "title": story.title,
+    "description": story.description,
+    "image_path": story.image_path,
+    "image_url": build_story_image_url(story.image_path)
+}), 200
+
+
+
 
 # '/matches' to be deleted
 @app.route("/matches")
 @login_required
 @profile_required
 def matches():
-    return "Matches page placeholder"
+    return render_template(
+        "matches.html",
+        is_logged_in=True
+    )
+
+@app.route("/api/matches")
+@login_required
+@profile_required
+def api_matches():
+    likes = Likes.query.filter_by(
+        liked_id=current_user.profile.id
+    ).all()
+
+    liker = []
+
+    for like in likes:
+        liker_profile = Profile.query.get(like.liker_id)
+
+        if liker_profile:
+            liker.append(profile_to_card(liker_profile))
+    
+
+    liked_likes = Likes.query.filter_by(
+        liker_id=current_user.profile.id
+    ).all()
+
+    liked = []
+
+    for like in liked_likes:
+        liked_profile = Profile.query.get(like.liked_id)
+
+        if liked_profile:
+            liked.append(profile_to_card(liked_profile))
+
+
+
+    return jsonify({
+        "likerprofiles": liker,
+        "likedprofiles": liked
+
+    })
+
+# def api_matches():
+#     my_profile_id = current_user.profile.id
+
+#     # People who liked me
+#     liked_you_likes = Likes.query.filter_by(
+#         liked_id=my_profile_id
+#     ).all()
+
+#     liked_you_profiles = []
+#     liked_you_ids = set()
+
+#     for like in liked_you_likes:
+#         profile = Profile.query.get(like.liker_id)
+
+#         if profile:
+#             liked_you_profiles.append(profile_to_card(profile))
+#             liked_you_ids.add(profile.id)
+
+#     # People I liked
+#     you_liked_likes = Likes.query.filter_by(
+#         liker_id=my_profile_id
+#     ).all()
+
+#     you_liked_profiles = []
+
+#     for like in you_liked_likes:
+#         # Do not show here if they already liked me
+#         if like.liked_id in liked_you_ids:
+#             continue
+
+#         profile = Profile.query.get(like.liked_id)
+
+#         if profile:
+#             you_liked_profiles.append(profile_to_card(profile))
+
+#     return jsonify({
+#         "liked_you": liked_you_profiles,
+#         "you_liked": you_liked_profiles
+#     })
+
+
+
 
 
 @app.route("/messages", methods=["GET", "POST"])
@@ -663,16 +868,32 @@ def messages():
     contacts = []
 
     if current_profile:
-        candidate_profiles = (
-            Profile.query
-            .filter(Profile.id != current_profile.id)
-            .order_by(Profile.display_name)
+        conversations = (
+            Conversation.query
+            .filter(or_(
+                Conversation.profile1_id == current_profile.id,
+                Conversation.profile2_id == current_profile.id
+            ))
+            .order_by(Conversation.created_at.desc())
             .all()
         )
 
+        contact_ids = [
+            conversation.profile2_id
+            if conversation.profile1_id == current_profile.id
+            else conversation.profile1_id
+            for conversation in conversations
+        ]
+
+        profiles_by_id = {
+            profile.id: profile
+            for profile in Profile.query.filter(Profile.id.in_(contact_ids)).all()
+        } if contact_ids else {}
+
         contacts = [
-            profile_to_card(profile)
-            for profile in candidate_profiles
+            profile_to_card(profiles_by_id[contact_id])
+            for contact_id in contact_ids
+            if contact_id in profiles_by_id
         ]
 
     return render_template(

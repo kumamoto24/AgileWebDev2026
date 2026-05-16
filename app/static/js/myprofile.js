@@ -320,14 +320,16 @@ const closeStory = document.getElementById("closeStory");
 const storyPicInput = document.getElementById("storyPicInput");
 const storyTitleInput = document.getElementById("storyTitleInput");
 const storyDescriptionInput = document.getElementById("storyDescriptionInput");
+const storyOrderInput = document.getElementById("storyOrderInput");
 
 let selectedStoryCard = null;
 
 function openStoryEditor(card) {
   selectedStoryCard = card;
 
-  storyTitleInput.value = card.querySelector(".story-title").textContent;
-  storyDescriptionInput.value = card.querySelector(".story-description").textContent.trim();
+  storyOrderInput.value = card.dataset.storyOrder;
+  storyTitleInput.value = card.dataset.storyTitle || "";
+  storyDescriptionInput.value = card.dataset.storyDescription || "";
   storyPicInput.value = "";
 
   storyModal.style.display = "block";
@@ -384,6 +386,7 @@ storyForm.addEventListener("submit", async (event) => {
   const formData = new FormData();
   formData.append("title", titleValue);
   formData.append("description", descValue);
+  formData.append("display_order", storyOrderInput.value);
   formData.append("csrf_token", csrfToken || "");
   
   // Get the file from input
@@ -391,6 +394,7 @@ storyForm.addEventListener("submit", async (event) => {
   if (file) {
     formData.append("image_path", file);
   }
+  
 
   // --- 3. Send Data to Backend ---
   try {
@@ -403,8 +407,14 @@ storyForm.addEventListener("submit", async (event) => {
       const result = await response.json();
 
       // --- 4. Success: Update UI Display ---
-      selectedStoryCard.querySelector(".story-title").textContent = titleValue;
-      selectedStoryCard.querySelector(".story-description").textContent = descValue;
+      const savedTitle = result.title || titleValue || "Untitled Story";
+      const savedDescription = result.description || descValue || "No description yet.";
+
+      selectedStoryCard.querySelector(".story-title").textContent = savedTitle;
+      selectedStoryCard.querySelector(".story-description").textContent = savedDescription;
+      selectedStoryCard.dataset.storyTitle = savedTitle;
+      selectedStoryCard.dataset.storyDescription = result.description || descValue;
+      selectedStoryCard.classList.remove("story-card-empty");
 
       // Update image preview using the local file (fast) or server path
       if (file) {
@@ -413,6 +423,8 @@ storyForm.addEventListener("submit", async (event) => {
           selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
         };
         reader.readAsDataURL(file);
+      } else if (result.image_url) {
+        selectedStoryCard.querySelector(".story-img").src = result.image_url;
       }
 
       storyModal.style.display = "none";
@@ -425,41 +437,4 @@ storyForm.addEventListener("submit", async (event) => {
     alert("Network error. Please check your connection and try again.");
   }
 });
-
-
-
-// storyForm.addEventListener("submit", (event) => {
-//   event.preventDefault();
-
-//   if (!selectedStoryCard) {
-//     return;
-//   }
-
-//   const titleWords = storyTitleInput.value.trim().split(/\s+/).filter(Boolean).length;
-//   const descWords = storyDescriptionInput.value.trim().split(/\s+/).filter(Boolean).length;
-
-//   if (titleWords > 21) {
-//     alert("Title must be 21 words or less.");
-//     return; // Stops the execution
-//   }
-
-//   if (descWords > 1500) {
-//     alert("Description must be 1500 words or less.");
-//     return; // Stops the execution
-//   }
-
-//   selectedStoryCard.querySelector(".story-title").textContent = storyTitleInput.value;
-//   selectedStoryCard.querySelector(".story-description").textContent = storyDescriptionInput.value;
-
-//   const file = storyPicInput.files[0];
-//   if (file) {
-//     const reader = new FileReader();
-//     reader.onload = function (loadEvent) {
-//       selectedStoryCard.querySelector(".story-img").src = loadEvent.target.result;
-//     };
-//     reader.readAsDataURL(file);
-//   }
-
-//   storyModal.style.display = "none";
-// });
 
