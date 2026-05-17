@@ -1,6 +1,17 @@
 import os
+import re
 
-from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
@@ -27,17 +38,81 @@ def profile():
             user_profile = Profile(user_id=current_user.id)
             db.session.add(user_profile)
 
-        user_profile.display_name = request.form.get("display_name")
-        user_profile.age = request.form.get("age", type=int)
-        user_profile.bio = request.form.get("bio")
-        user_profile.gender = request.form.get("gender")
-        user_profile.orientation = request.form.get("orientation")
-        user_profile.location_text = request.form.get("location_text")
-        user_profile.latitude = request.form.get("latitude", type=float)
-        user_profile.longitude = request.form.get("longitude", type=float)
-        user_profile.place_id = request.form.get("place_id")
+        allowed_genders = ["Male", "Female", "Other"]
+        allowed_orientations = [
+            "Straight",
+            "Gay",
+            "Lesbian",
+            "Other",
+            "Not Specified"
+        ]
 
+        display_name = request.form.get("display_name", "").strip()
+        age = request.form.get("age", type=int)
+        bio = request.form.get("bio", "").strip()
+        gender = request.form.get("gender", "").strip()
+        orientation = request.form.get("orientation", "").strip()
+        location_text = request.form.get("location_text", "").strip()
+        latitude = request.form.get("latitude", type=float)
+        longitude = request.form.get("longitude", type=float)
+        place_id = request.form.get("place_id", "").strip()
         submitted_interests = request.form.getlist("interest")
+
+        # 1. Name validation
+        if not display_name:
+            flash("Name cannot be blank.")
+            return redirect(url_for("profiles.profile"))
+
+        if not re.fullmatch(r"[A-Za-z\s\-']+", display_name):
+            flash("Name can only contain letters, spaces, hyphens, and apostrophes.")
+            return redirect(url_for("profiles.profile"))
+
+        if len(display_name) < 2:
+            flash("Name must be at least 2 characters long.")
+            return redirect(url_for("profiles.profile"))
+
+        # 2. Age validation
+        if age is None or age < 18:
+            flash("Age must be 18 or above.")
+            return redirect(url_for("profiles.profile"))
+
+        # 3. Location validation
+        if not location_text or not place_id or latitude is None or longitude is None:
+            flash("Please select a valid city in Australia from the suggestions.")
+            return redirect(url_for("profiles.profile"))
+
+        # 4. Gender and orientation validation
+        if gender not in allowed_genders:
+            flash("Please select a valid gender.")
+            return redirect(url_for("profiles.profile"))
+
+        if orientation not in allowed_orientations:
+            flash("Please select a valid sexual orientation.")
+            return redirect(url_for("profiles.profile"))
+
+        # 5. Interests validation
+        if not submitted_interests:
+            flash("Please select at least one interest.")
+            return redirect(url_for("profiles.profile"))
+
+        # 6. Bio word count validation
+        bio_word_count = len(bio.split())
+
+        if bio_word_count > 1000:
+            flash("Bio must be 1000 words or less.")
+            return redirect(url_for("profiles.profile"))
+
+        # Save validated values
+        user_profile.display_name = display_name
+        user_profile.age = age
+        user_profile.bio = bio
+        user_profile.gender = gender
+        user_profile.orientation = orientation
+        user_profile.location_text = location_text
+        user_profile.latitude = latitude
+        user_profile.longitude = longitude
+        user_profile.place_id = place_id
+
         user_profile.interests = []
         for name in submitted_interests:
             interest_obj = Interest.query.filter_by(name=name).first()
