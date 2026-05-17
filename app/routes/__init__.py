@@ -7,6 +7,7 @@ from app.routes.profiles import profiles_bp
 
 
 def register_blueprints(app):
+    # Register all route blueprints with the Flask application.
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(discovery_bp)

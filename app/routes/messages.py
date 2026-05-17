@@ -7,6 +7,7 @@ from app.helpers import profile_to_card
 from app.models import Conversation, Profile
 
 
+# Routes for displaying the current user's conversation contacts.
 messages_bp = Blueprint("messages", __name__)
 
 
@@ -14,11 +15,13 @@ messages_bp = Blueprint("messages", __name__)
 @login_required
 @profile_required
 def messages():
+    # Render conversations as contact cards for the current profile.
     current_profile = current_user.profile
 
     contacts = []
 
     if current_profile:
+        # Conversations include two profile IDs, so either side can be the current user.
         conversations = (
             Conversation.query
             .filter(or_(
@@ -36,6 +39,7 @@ def messages():
             for conversation in conversations
         ]
 
+        # Load all contact profiles in one query and keep the conversation order.
         profiles_by_id = {
             profile.id: profile
             for profile in Profile.query.filter(Profile.id.in_(contact_ids)).all()

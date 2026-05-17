@@ -25,16 +25,19 @@ from app.helpers import (
 from app.models import Interest, Likes, Profile, Story
 
 
+# Routes for creating, viewing, and updating user profile content.
 profiles_bp = Blueprint("profiles", __name__)
 
 
 @profiles_bp.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
+    # Display and update the current user's profile details.
     user_profile = current_user.profile
 
     if request.method == "POST":
         if not user_profile:
+            # New users may reach this route before completing their profile.
             user_profile = Profile(user_id=current_user.id)
             db.session.add(user_profile)
 
@@ -114,6 +117,7 @@ def profile():
         user_profile.place_id = place_id
 
         user_profile.interests = []
+        # Store only known interests from the seed data.
         for name in submitted_interests:
             interest_obj = Interest.query.filter_by(name=name).first()
             if interest_obj:
@@ -140,11 +144,13 @@ def profile():
 @login_required
 @profile_required
 def profile_detail(profile_id):
+    # Render another user's profile with story and like status data.
     profile = db.session.get(Profile, profile_id)
     if profile is None:
         abort(404)
     current_profile = current_user.profile
 
+    # Let the template render the correct like button state.
     is_liked = Likes.query.filter_by(
         liker_id=current_profile.id,
         liked_id=profile.id
@@ -185,6 +191,7 @@ def profile_detail(profile_id):
 @profiles_bp.route("/profile/image", methods=["POST"])
 @login_required
 def update_profile_image():
+    # Upload and save the current user's profile image.
     profile = current_user.profile
 
     if not profile:
@@ -200,6 +207,7 @@ def update_profile_image():
             "message": "No profile image was uploaded."
         }), 400
 
+    # secure_filename prevents unsafe path characters in uploaded filenames.
     filename = secure_filename(image_file.filename)
     upload_subdir = "uploads/profile_images"
     upload_folder = os.path.join(current_app.static_folder, upload_subdir)
@@ -220,6 +228,7 @@ def update_profile_image():
 @profiles_bp.route("/update-story", methods=["POST"])
 @login_required
 def update_story():
+    # Create or update one of the current user's profile story slots.
     profile = current_user.profile
 
     if not profile:
@@ -240,6 +249,7 @@ def update_story():
         display_order=display_order
     ).first()
 
+    # Each profile has three editable story slots identified by display_order.
     if not story:
         story = Story(
             profile_id=profile.id,
@@ -254,6 +264,7 @@ def update_story():
     image_file = request.files.get("image_path")
 
     if image_file and image_file.filename:
+        # Story uploads share the same static uploads pattern as profile images.
         filename = secure_filename(image_file.filename)
         upload_subdir = "uploads/story_images"
         upload_folder = current_app.config.get(

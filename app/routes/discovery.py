@@ -14,6 +14,7 @@ from app.helpers import (
 from app.models import Interest, Profile
 
 
+# API endpoints that power profile recommendations and search.
 discovery_bp = Blueprint("discovery", __name__)
 
 
@@ -21,6 +22,7 @@ discovery_bp = Blueprint("discovery", __name__)
 @login_required
 @profile_required
 def recommended_profiles():
+    # Return compatible profile cards ordered by calculated match score.
     if not current_user.is_authenticated:
         return jsonify([])
 
@@ -41,6 +43,7 @@ def recommended_profiles():
 
     recommendations = []
 
+    # Score only complete and compatible profiles before returning the best matches.
     for candidate in candidate_profiles:
         if not candidate.is_complete:
             continue
@@ -88,6 +91,7 @@ def recommended_profiles():
 @login_required
 @profile_required
 def search_profiles():
+    # Search complete compatible profiles using filters from query parameters.
     keyword = request.args.get("keyword", "").strip()
 
     selected_interests = [
@@ -116,6 +120,7 @@ def search_profiles():
     query = Profile.query
     query = query.filter(Profile.id != current_profile.id)
 
+    # Build the database filters first, then apply compatibility and distance checks.
     if keyword:
         query = query.filter(
             db.or_(
@@ -143,6 +148,7 @@ def search_profiles():
 
     results = []
 
+    # Final filtering happens in Python because distance and compatibility use helpers.
     for profile in candidate_profiles:
         if not profile.is_complete:
             continue
