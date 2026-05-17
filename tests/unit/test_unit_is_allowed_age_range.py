@@ -1,4 +1,4 @@
-from app.routes import is_allowed_age_range
+from app.helpers import is_allowed_age_range
 
 
 def test_is_allowed_age_range_allows_none_none():

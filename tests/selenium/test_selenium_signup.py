@@ -82,7 +82,7 @@ def test_signup_page_renders_and_accepts_new_user(live_server_url, browser):
 
     #NB:the mocking ggogle API request 
     #it replaces the actual call to Google's reCAPTCHA verification endpoint with a mock that always returns success.
-    with patch("app.routes.requests.post") as mock_post:
+    with patch("app.routes.auth.requests.post") as mock_post:
         mock_post.return_value.json.return_value = {"success": True}
         #Above is the recaptcha verification response that the app expects to receive from Google's API when the reCAPTCHA is successfully solved.
         email_input.send_keys(new_email)

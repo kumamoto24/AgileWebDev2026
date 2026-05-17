@@ -18,7 +18,7 @@ socketio = SocketIO(app, async_mode="threading")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = "login"  # where to redirect if not logged in
+login_manager.login_view = "auth.login"  # where to redirect if not logged in
 
 
 @app.context_processor
@@ -26,4 +26,7 @@ def inject_csrf_token():
     return dict(csrf_token=generate_csrf)
 
 
-from app import routes,models,sockets, user_loader 
+from app import models, sockets, user_loader
+from app.routes import register_blueprints
+
+register_blueprints(app)

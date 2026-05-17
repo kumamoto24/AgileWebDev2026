@@ -7,7 +7,7 @@ block content %} {% if not is_logged_in %}
 
     <h2 style="font-weight: 750">Login</h2>
 
-    <form action="{{ url_for('login') }}" method="post">
+    <form action="{{ url_for('auth.login') }}" method="post">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="input-group">
         <input type="email" id="email" name="email" placeholder=" " required />
@@ -29,7 +29,7 @@ block content %} {% if not is_logged_in %}
 
     <!-- Sign Up Link -->
     <div class="extra-links">
-      <p>Don't have an account? <a href="{{url_for('signup')}}">Sign up</a></p>
+      <p>Don't have an account? <a href="{{url_for('auth.signup')}}">Sign up</a></p>
     </div>
   </div>
 </div>
@@ -58,7 +58,7 @@ block content %} {% if not is_logged_in %}
     </p>
 
     <a
-      href="{{ url_for('signup') }}"
+      href="{{ url_for('auth.signup') }}"
       class="btn-primary-custom mt-3 text-decoration-none"
     >
       Get Started
@@ -142,7 +142,7 @@ block content %} {% if not is_logged_in %}
     </p>
 
     <a
-      href="{{ url_for('signup') }}"
+      href="{{ url_for('auth.signup') }}"
       class="btn-secondary-custom text-decoration-none"
     >
       Create Account
