@@ -134,16 +134,7 @@
   min-height: 110px;
 }
 
-.profile-popup .checkbox-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
 
-.profile-popup .checkbox-group input[type="checkbox"] {
-    width: auto; /* Overrides the 100% width from your general input style */
-    margin-bottom: 0;
-}
 
 .input-hint {
     font-size: 12px;
