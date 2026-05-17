@@ -1,4 +1,4 @@
-from flask import flash, render_template, jsonify, request, redirect, url_for, current_app
+from flask import flash, render_template, jsonify, request, redirect, url_for, current_app, abort
 
 from app import app, db
 import os
@@ -619,7 +619,9 @@ def profile():
 @login_required
 @profile_required
 def profile_detail(profile_id):
-    profile = Profile.query.get_or_404(profile_id)
+    profile = db.session.get(Profile, profile_id)
+    if profile is None:
+        abort(404)
     current_profile = current_user.profile
 
     is_liked = Likes.query.filter_by(
@@ -663,7 +665,9 @@ def profile_detail(profile_id):
 @profile_required
 def handle_like(profile_id):
     current_profile = current_user.profile
-    liked_profile = Profile.query.get_or_404(profile_id)
+    liked_profile = db.session.get(Profile, profile_id)
+    if liked_profile is None:
+        abort(404)
 
     if liked_profile.id == current_profile.id:
         return jsonify({"status": "error", "message": "You cannot like yourself."}), 400
