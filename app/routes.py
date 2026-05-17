@@ -833,48 +833,6 @@ def api_matches():
 
     })
 
-# def api_matches():
-#     my_profile_id = current_user.profile.id
-
-#     # People who liked me
-#     liked_you_likes = Likes.query.filter_by(
-#         liked_id=my_profile_id
-#     ).all()
-
-#     liked_you_profiles = []
-#     liked_you_ids = set()
-
-#     for like in liked_you_likes:
-#         profile = Profile.query.get(like.liker_id)
-
-#         if profile:
-#             liked_you_profiles.append(profile_to_card(profile))
-#             liked_you_ids.add(profile.id)
-
-#     # People I liked
-#     you_liked_likes = Likes.query.filter_by(
-#         liker_id=my_profile_id
-#     ).all()
-
-#     you_liked_profiles = []
-
-#     for like in you_liked_likes:
-#         # Do not show here if they already liked me
-#         if like.liked_id in liked_you_ids:
-#             continue
-
-#         profile = Profile.query.get(like.liked_id)
-
-#         if profile:
-#             you_liked_profiles.append(profile_to_card(profile))
-
-#     return jsonify({
-#         "liked_you": liked_you_profiles,
-#         "you_liked": you_liked_profiles
-#     })
-
-
-
 
 
 @app.route("/messages", methods=["GET", "POST"])
