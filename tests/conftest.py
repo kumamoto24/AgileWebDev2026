@@ -27,6 +27,7 @@ def pytest_sessionstart(session):
 def pytest_sessionfinish(session, exitstatus):
     with app.app_context():
         db.session.remove()
+        db.engine.dispose()
 
     if TEST_DATABASE_PATH.exists():
         TEST_DATABASE_PATH.unlink()
