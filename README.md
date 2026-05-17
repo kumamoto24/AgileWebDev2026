@@ -1,6 +1,8 @@
-# CITS3403 Group Project: Heart Link
+# HeartLink: An Online Dating Website
 ## Description
-Heart Link is a web application designed to help users build meaningful social connections through a simple, interactive online experience. The platform supports user registration, login, and real-time communication features, creating a foundation for connecting people in a more personal and engaging way. Built with a modular Flask structure and supported by automated testing, Heart Link is designed to be maintainable, scalable, and suitable for collaborative development.
+HeartLink is a social connection web application designed to help users in Australia discover and build meaningful relationships online. Users can register an account, complete their profile, add interests and stories, browse recommended profiles, search for other users, like profiles, view matches, and communicate through real-time messaging.
+
+The platform focuses on creating a simple and engaging experience for online social discovery. It combines profile-based recommendations, location-based search, interactive profile pages, and messaging features to support more personal connections. The application is built with a modular Flask structure, making it suitable for collaborative development and future extension.
 
 ## Group Members
 
@@ -37,6 +39,7 @@ This project uses a Flask-based web development stack with server-side templates
 | Real-time Communication | Flask-SocketIO, Socket.IO |
 | Frontend | HTML, CSS, JavaScript, Jinja2 templates |
 | Location Services | Google Maps Places API |
+| Test | Pytest, Selenium |
 
 
 ## Installation and Setup
@@ -109,33 +112,47 @@ http://127.0.0.1:5000
 ```text
 AgileWebDev2026/
 ├── app/                         Main Flask application package.
-│   ├── static/                  Static frontend assets used by the web pages.
-│   │   ├── css/                 CSS stylesheets for layout and page styling.
-│   │   ├── images/              Default images, logos, and static image assets.
-│   │   ├── js/                  JavaScript files for frontend interactions and API requests.
-│   │   └── uploads/             Local storage for user-uploaded profile and story images.
+│   ├── routes/                  Flask Blueprint modules grouped by feature.
+│   │   ├── __init__.py          Registers all Blueprints for the app.
+│   │   ├── auth.py              Signup, login, logout, and authentication routes.
+│   │   ├── main.py              Index page and logged-in homepage routes.
+│   │   ├── discovery.py         Profile search and recommendation APIs.
+│   │   ├── profiles.py          Profile pages, image upload, and story routes.
+│   │   ├── matches.py           Likes, matches page, and related APIs.
+│   │   └── messages.py          Messages page route.
 │   │
-│   ├── templates/               Jinja2 HTML templates for application pages.
+│   ├── static/                  Static files used by frontend pages.
+│   │   ├── css/                 Stylesheets for page layout and visual design.
+│   │   ├── images/              Default images, logos, and static assets.
+│   │   ├── js/                  JavaScript for page interaction and API calls.
+│   │   └── uploads/             Local storage for uploaded profile and story images.
 │   │
-│   ├── __init__.py              Creates and configures the Flask application instance.
-│   ├── models.py                Defines the database models.
-│   ├── routes.py                Defines page routes and API endpoints.
-│   ├── sockets.py               Handles real-time messaging events.
-│   └── user_loader.py           Loads users for Flask-Login.
+│   ├── templates/               Jinja2 HTML templates rendered by Flask.
+│   │
+│   ├── __init__.py              Flask app creation and extension setup.
+│   ├── models.py                Database models and relationships.
+│   ├── helpers.py               Shared helper functions used across routes.
+│   ├── decorators.py            Custom route guards such as profile_required.
+│   ├── conversations.py         Conversation creation and lookup logic.
+│   ├── sockets.py               Socket.IO events for real-time messaging.
+│   └── user_loader.py           Flask-Login user loading logic.
 │
-├── migrations/                  Database migration files managed by Flask-Migrate and Alembic.
-│   └── versions/                Migration scripts for database schema updates.
+├── migrations/                  Flask-Migrate and Alembic migration files.
+│   └── versions/                Database schema migration scripts.
 │
-├── tests/                       Unit tests and Selenium tests.
+├── tests/                       Automated tests for the project.
+│   ├── selenium/                Browser-based tests for user flows.
+│   └── unit/                    Unit tests for backend logic and helpers.
 │
-├── config.py                    Stores Flask configuration settings.
-├── run.py                       Application entry point.
-├── seed.py                      Inserts demo data for local development.
-├── requirements.txt             Lists Python package dependencies.
+├── config.py                    Flask configuration settings.
+├── run.py                       Application entry point for running the server.
+├── seed.py                      Script for inserting demo development data.
+├── requirements.txt             Python package dependencies.
 ├── README.md                    Project documentation.
-├── .env                         Local environment variables, not committed to Git.
+├── LICENSE                      Project license file.
 └── .gitignore                   Files and folders ignored by Git.
 ```
+
 ## Contributing
 
 This project was a collaborative effort with contributions from the following developers:
@@ -149,7 +166,8 @@ This project was a collaborative effort with contributions from the following de
   - Implemented backend support for profile-related features, including story cards and image upload handling.
   - Set up the basic Flask server structure and organised the overall project structure.
   - Designed the main database schema and managed database migrations during development.
-  - Wrote test files for the homepage and related user flow features.
+  - Developed unit tests and selenium tests for the homepage, messaging and related user flow features.
+  - Introduced Flask Blueprints to organise routes and improve code maintainability.
   - Actively participated in issue discussions and pull request reviews throughout the project.
 
 - [Ichirin Okamoto](https://github.com/ichirin0311)
@@ -160,8 +178,8 @@ This project was a collaborative effort with contributions from the following de
   - Added story cards to the profile page for displaying personal stories with images and descriptions, as well as and click-to-view popup models
   - Added a Like button on the User Profile page to record like relationships between users.
   - Designed and implemented the Matches page to show users liked by the current user and users who liked the current user.
-  - Contributed to the database design for profile, story.
-  - Developed unit tests and Selenium end-to-end tests for profile, story, authentication, and matching features.
+  - Contributed to the database design for profile, story classes.
+  - Developed unit tests and selenium end-to-end tests for profile, story, authentication, and matching features.
   - Actively participated in issue discussions and pull request reviews throughout the project.
 - [Shakeel Jaumally](https://github.com/Shakeel-Droid)
   - Designed and implemented the frontend and backend logic for the login modal and signup page.
@@ -171,7 +189,7 @@ This project was a collaborative effort with contributions from the following de
   - Implemented CSRF tokens to protect authentication-related forms from cross-site request forgery attacks, including frontend integration for secure request handling.
   - Added Google reCAPTCHA verification to the login process to improve account security.
   - Wrote test files for authentication-related features, including unit tests for signup validation and password mismatch handling.
-  - Developed Selenium end-to-end tests to validate critical user flows including signup, login/logout, messaging, and matches functionality in a live test environment.
+  - Developed selenium end-to-end tests to validate critical user flows including signup, login/logout, messaging, and matches functionality in a live test environment.
   - Actively participated in issue discussions and pull request reviews throughout the project.
 > **Note:** The index page was completed collaboratively by all group members. The featured profiles feature was compeleted by [Zikun Hu](https://github.com/kumamoto24).
 
