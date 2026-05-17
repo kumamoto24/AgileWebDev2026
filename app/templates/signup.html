@@ -149,7 +149,7 @@ block extra_head %}
     <!-- Left Image -->
     <div class="image-section">
       <a
-        href="{{ url_for('index') }}"
+        href="{{ url_for('main.index') }}"
         class="back-button"
         aria-label="Back to home page"
       >
@@ -178,7 +178,7 @@ block extra_head %}
       </div>
       {% endif %}
 
-      <form class="signup-form" action="{{ url_for('signup') }}" method="post">
+      <form class="signup-form" action="{{ url_for('auth.signup') }}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div class="input-group">
