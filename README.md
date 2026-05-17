@@ -101,6 +101,12 @@ python seed.py
 python run.py
 ```
 
+8. Run the test suite:
+
+```bash
+pytest -q
+```
+
 The application will be available at:
 
 ```text
