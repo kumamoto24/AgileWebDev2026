@@ -1,4 +1,4 @@
-from app.routes import calculate_match_score
+from app.helpers import calculate_match_score
 
 
 class CandidateStub:

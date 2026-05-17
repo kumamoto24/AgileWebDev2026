@@ -1,4 +1,4 @@
-from app.routes import build_story_slots
+from app.helpers import build_story_slots
 
 
 class StoryStub:
@@ -10,7 +10,7 @@ class StoryStub:
 
 
 def test_build_story_slots_returns_three_empty_slots_when_no_stories(monkeypatch):
-    monkeypatch.setattr("app.routes.build_story_image_url", lambda image_path: "/static/default-story.jpg")
+    monkeypatch.setattr("app.helpers.build_story_image_url", lambda image_path: "/static/default-story.jpg")
 
     slots = build_story_slots([])
 
@@ -24,7 +24,7 @@ def test_build_story_slots_returns_three_empty_slots_when_no_stories(monkeypatch
 
 
 def test_build_story_slots_places_named_story_in_correct_slot(monkeypatch):
-    monkeypatch.setattr("app.routes.build_story_image_url", lambda image_path: f"/static/{image_path}")
+    monkeypatch.setattr("app.helpers.build_story_image_url", lambda image_path: f"/static/{image_path}")
 
     stories = [
         StoryStub(
@@ -50,7 +50,7 @@ def test_build_story_slots_places_named_story_in_correct_slot(monkeypatch):
 
 
 def test_build_story_slots_ignores_stories_outside_slot_range(monkeypatch):
-    monkeypatch.setattr("app.routes.build_story_image_url", lambda image_path: "/static/default-story.jpg")
+    monkeypatch.setattr("app.helpers.build_story_image_url", lambda image_path: "/static/default-story.jpg")
 
     stories = [
         StoryStub(

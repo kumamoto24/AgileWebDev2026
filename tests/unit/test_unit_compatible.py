@@ -1,4 +1,4 @@
-from app.routes import compatible
+from app.helpers import compatible
 
 
 class ProfileStub:

@@ -1,4 +1,4 @@
-from app.routes import calculate_distance_km
+from app.helpers import calculate_distance_km
 
 
 def test_calculate_distance_km_between_perth_and_fremantle():
