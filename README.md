@@ -165,10 +165,13 @@ This project was a collaborative effort with contributions from the following de
   - Actively participated in issue discussions and pull request reviews throughout the project.
 - [Shakeel Jaumally](https://github.com/Shakeel-Droid)
   - Designed and implemented the frontend and backend logic for the login modal and signup page.
-  - Integrated Flask-Login to support user authentication and session management.
-  - Implemented CSRF tokens to protect authentication-related forms from cross-site request forgery attacks.
+  - Implemented backend /signup route logic with secure user creation, password hashing, input validation, and duplicate email prevention.
+  - Added password confirmation handling and validation logic across frontend and backend signup flow to ensure consistent and secure user registration.
+  - Integrated Flask-Login to support user authentication and session management, replacing manual session handling with standardized authentication system.
+  - Implemented CSRF tokens to protect authentication-related forms from cross-site request forgery attacks, including frontend integration for secure request handling.
   - Added Google reCAPTCHA verification to the login process to improve account security.
-  - Wrote test files for the authentication-related features he developed.
+  - Wrote test files for authentication-related features, including unit tests for signup validation and password mismatch handling.
+  - Developed Selenium end-to-end tests to validate critical user flows including signup, login/logout, messaging, and matches functionality in a live test environment.
   - Actively participated in issue discussions and pull request reviews throughout the project.
 > **Note:** The index page was completed collaboratively by all group members. The featured profiles feature was compeleted by [Zikun Hu](https://github.com/kumamoto24).
 
