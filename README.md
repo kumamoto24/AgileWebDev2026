@@ -155,6 +155,7 @@ This project was a collaborative effort with contributions from the following de
 - [Ichirin Okamoto](https://github.com/ichirin0311)
   - Developed the frontend and backend logic for the My Profile and User Profile pages.
   - Implemented profile editing features, allowing users to update their personal information.
+  - Added format checks of user inputs including age checks, word limitation in bio and location entry to align Google API suggestions
   - Integrated Google Places API in the profile editing page.
   - Added story cards to the profile page for displaying personal stories with images and descriptions, as well as and click-to-view popup models
   - Added a Like button on the User Profile page to record like relationships between users.
