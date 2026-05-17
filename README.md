@@ -156,11 +156,11 @@ This project was a collaborative effort with contributions from the following de
   - Developed the frontend and backend logic for the My Profile and User Profile pages.
   - Implemented profile editing features, allowing users to update their personal information.
   - Integrated Google Places API in the profile editing page.
-  - Added story cards to the profile page for displaying personal stories with images and descriptions.
+  - Added story cards to the profile page for displaying personal stories with images and descriptions, as well as and click-to-view popup models
   - Added a Like button on the User Profile page to record like relationships between users.
   - Designed and implemented the Matches page to show users liked by the current user and users who liked the current user.
   - Contributed to the database design for profile, story.
-  - Wrote test files for the profile and related features.
+  - Developed unit tests and Selenium end-to-end tests for profile, story, authentication, and matching features.
   - Actively participated in issue discussions and pull request reviews throughout the project.
 - [Shakeel Jaumally](https://github.com/Shakeel-Droid)
   - Designed and implemented the frontend and backend logic for the login modal and signup page.
