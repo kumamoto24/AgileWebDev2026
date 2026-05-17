@@ -7,11 +7,13 @@ from app.helpers import get_feature_profile
 from app.models import Profile, User
 
 
+# Routes for signup, login, and logout live in the auth blueprint.
 auth_bp = Blueprint("auth", __name__)
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
+    # Create a new user account after validating form fields and CAPTCHA.
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
@@ -53,6 +55,7 @@ def signup():
         captcha_response = request.form.get("g-recaptcha-response")
         secret_key = current_app.config["RECAPTCHA_SECRET_KEY"]
 
+        # Ask Google to verify the CAPTCHA token before creating the account.
         verify_response = requests.post(
             "https://www.google.com/recaptcha/api/siteverify",
             data={
@@ -76,6 +79,7 @@ def signup():
         db.session.add(new_user)
         db.session.flush()
 
+        # Create the matching profile immediately so protected profile routes work.
         new_profile = Profile(
             id=new_user.id,
             user_id=new_user.id
@@ -96,6 +100,7 @@ def signup():
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
+    # Authenticate an existing user and start their login session.
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
@@ -119,6 +124,7 @@ def login():
             )
 
         remember = request.form.get("remember") == "on"
+        # Flask-Login stores the authenticated user in the session.
         login_user(user, remember=remember)
 
         return redirect(url_for("main.home"))
@@ -133,5 +139,6 @@ def login():
 
 @auth_bp.route("/logout", methods=["GET", "POST"])
 def logout():
+    # End the current user session and return to the landing page.
     logout_user()
     return redirect(url_for("main.index"))

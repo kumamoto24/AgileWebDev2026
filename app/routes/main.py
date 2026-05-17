@@ -5,12 +5,14 @@ from app.decorators import profile_required
 from app.helpers import AGE_RANGES, ALL_INTERESTS, get_feature_profile
 
 
+# Page routes for the public landing page and logged-in home page.
 main_bp = Blueprint("main", __name__)
 
 
 @main_bp.route("/")
 @main_bp.route("/index")
 def index():
+    # Render the public landing page with featured profiles.
     return render_template(
         "index.html",
         is_logged_in=False,
@@ -22,6 +24,7 @@ def index():
 @login_required
 @profile_required
 def home():
+    # Render the logged-in homepage with discovery filter data.
     current_profile = current_user.profile
 
     username = (
@@ -30,6 +33,7 @@ def home():
         else "Demo User"
     )
 
+    # Search filters are passed to the template so the homepage can load discovery UI.
     return render_template(
         "logged_in_homepage.html",
         username=username,

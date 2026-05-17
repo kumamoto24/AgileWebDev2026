@@ -187,18 +187,18 @@ def compatible(current_profile, candidate):
     candidate_gender = candidate.gender.lower()
     candidate_orientation = candidate.orientation.lower()
 
-    if current_orientation == "straight":
-        if current_gender == "male":
-            return candidate_gender == "female" and candidate_orientation == "straight"
-        if current_gender == "female":
-            return candidate_gender == "male" and candidate_orientation == "straight"
+    if current_orientation == "Straight":
+        if current_gender == "Male":
+            return candidate_gender == "Female" and candidate_orientation == "Straight"
+        if current_gender == "Female":
+            return candidate_gender == "Male" and candidate_orientation == "Straight"
         return True
 
-    if current_orientation == "gay":
-        return candidate_orientation == "gay"
+    if current_orientation == "Gay":
+        return candidate_orientation == "Gay"
 
-    if current_orientation == "lesbian":
-        return candidate_orientation == "lesbian"
+    if current_orientation == "Lesbian":
+        return candidate_orientation == "Lesbian"
 
     return True
 

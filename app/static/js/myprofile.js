@@ -13,6 +13,9 @@ const displayBio = document.getElementById("displayBio");
 const nameInput = document.getElementById("nameInput");
 const ageInput = document.getElementById("ageInput");
 const locationInput = document.getElementById("locationInput");
+const locationPlaceIdInput = document.getElementById("locationPlaceId");
+const locationLatitudeInput = document.getElementById("locationLatitude");
+const locationLongitudeInput = document.getElementById("locationLongitude");
 // const interestsInput = document.getElementById("interestsInput");
 
 
@@ -35,50 +38,15 @@ closeProfile.addEventListener("click", () => {
   profileModal.style.display = "none";
 });
 
-// Function to verify manual text against Google Places
-
-async function verifyLocationManually(text) {
-    try {
-        const { AutocompleteService } = await google.maps.importLibrary("places");
-        const service = new AutocompleteService();
-        const request = { input: text, types: ['(cities)'], componentRestrictions: { country: "au" } };
-        
-        return new Promise((resolve) => {
-            service.getPlacePredictions(request, (predictions, status) => {
-                if (status === "OK" && predictions.length > 0) {
-                    const prediction = predictions[0];
-                    const detailsService = new google.maps.places.PlacesService(document.createElement("div"));
-
-                    detailsService.getDetails(
-                      {
-                        placeId: prediction.place_id,
-                        fields: ["place_id", "formatted_address", "name", "geometry"]
-                      },
-                      (place, detailsStatus) => {
-                        if (detailsStatus !== "OK" || !place) {
-                          resolve(null);
-                          return;
-                        }
-
-                        resolve({
-                          place_id: place.place_id,
-                          description: place.formatted_address || place.name || prediction.description,
-                          latitude: place.geometry?.location?.lat(),
-                          longitude: place.geometry?.location?.lng()
-                        });
-                      }
-                    );
-                } else {
-                    resolve(null);
-                }
-            });
-        });
-    } catch (e) {
-        return null;
-    }
+function clearSelectedLocation() {
+  locationPlaceIdInput.value = "";
+  locationLatitudeInput.value = "";
+  locationLongitudeInput.value = "";
 }
 
-profileForm.addEventListener("submit", async (event) => {
+locationInput.addEventListener("input", clearSelectedLocation);
+
+profileForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   // 1. Name validation
@@ -107,22 +75,12 @@ profileForm.addEventListener("submit", async (event) => {
   }
 
   // 3. Location validation
-  const locIdInput = document.getElementById("locationPlaceId");
-  let placeId = locIdInput ? locIdInput.value : null;
-
-  if (!placeId && locationInput.value.trim()) {
-    const verified = await verifyLocationManually(locationInput.value.trim());
-
-    if (verified) {
-      if (locIdInput) locIdInput.value = verified.place_id;
-      locationInput.value = verified.description;
-      document.getElementById("locationLatitude").value = verified.latitude || "";
-      document.getElementById("locationLongitude").value = verified.longitude || "";
-      placeId = verified.place_id;
-    }
-  }
-
-  if (!placeId) {
+  if (
+    !locationInput.value.trim() ||
+    !locationPlaceIdInput.value ||
+    !locationLatitudeInput.value ||
+    !locationLongitudeInput.value
+  ) {
     alert("Please select a valid city in Australia from the suggestions.");
     return;
   }
@@ -163,19 +121,22 @@ function initAutocomplete() {
 
   const autocomplete = new google.maps.places.Autocomplete(locationInput, {
     types: ["(cities)"],
+    componentRestrictions: { country: "au" },
     fields: ["place_id", "name", "formatted_address", "geometry"]
   });
 
   autocomplete.addListener("place_changed", () => {
     const place = autocomplete.getPlace();
 
-    locationInput.value = place.formatted_address || place.name || "";
-    document.getElementById("locationPlaceId").value = place.place_id || "";
-
-    if (place.geometry && place.geometry.location) {
-      document.getElementById("locationLatitude").value = place.geometry.location.lat();
-      document.getElementById("locationLongitude").value = place.geometry.location.lng();
+    if (!place.place_id || !place.geometry?.location) {
+      clearSelectedLocation();
+      return;
     }
+
+    locationInput.value = place.formatted_address || place.name || "";
+    locationPlaceIdInput.value = place.place_id;
+    locationLatitudeInput.value = place.geometry.location.lat();
+    locationLongitudeInput.value = place.geometry.location.lng();
   });
 }
 

@@ -8,6 +8,7 @@ from app.helpers import profile_to_card
 from app.models import Likes, Profile
 
 
+# Routes for likes, matches, and match-related API responses.
 matches_bp = Blueprint("matches", __name__)
 
 
@@ -15,6 +16,7 @@ matches_bp = Blueprint("matches", __name__)
 @login_required
 @profile_required
 def handle_like(profile_id):
+    # Create or remove a like and open a conversation when a like is added.
     current_profile = current_user.profile
     liked_profile = db.session.get(Profile, profile_id)
     if liked_profile is None:
@@ -31,6 +33,7 @@ def handle_like(profile_id):
         liked_id=liked_profile.id
     ).first()
 
+    # A like also prepares a conversation so users can message matched profiles.
     if action == "like":
         if not existing_like:
             db.session.add(Likes(
@@ -64,6 +67,7 @@ def handle_like(profile_id):
 @login_required
 @profile_required
 def matches():
+    # Render the matches page shell for the current profile.
     return render_template(
         "matches.html",
         is_logged_in=True
@@ -74,6 +78,7 @@ def matches():
 @login_required
 @profile_required
 def api_matches():
+    # Return profiles who liked the user and profiles the user has liked.
     likes = Likes.query.filter_by(
         liked_id=current_user.profile.id
     ).all()
@@ -92,6 +97,7 @@ def api_matches():
 
     liked = []
 
+    # Convert database profiles to the same card shape used by discovery results.
     for like in liked_likes:
         liked_profile = db.session.get(Profile, like.liked_id)
 
