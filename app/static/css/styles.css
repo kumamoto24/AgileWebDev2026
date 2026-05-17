@@ -132,19 +132,7 @@ h5 {
   background-color: #5a54d1;
 }
 
-/* Outline button */
-.btn-outline-custom {
-  background-color: transparent;
-  color: var(--primary-color);
-  border: 2px solid var(--primary-color);
-  padding: 10px 20px;
-  border-radius: 30px;
-}
 
-.btn-outline-custom:hover {
-  background-color: var(--primary-color);
-  color: var(--white);
-}
 
 /* Card */
 
