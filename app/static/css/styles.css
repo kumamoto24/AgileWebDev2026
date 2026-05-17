@@ -60,12 +60,7 @@ body {
   color: #ffd6e0;
 }
 
-/* Navbar button */
-.navbar-custom .btn {
-  border-radius: 25px;
-  padding: 6px 16px;
-  font-size: 0.9rem;
-}
+
 
 /* Login buttton */
 .btn-login {
