@@ -2,19 +2,6 @@ import os
 import sys
 import threading
 from pathlib import Path
-
-import pytest
-from werkzeug.serving import make_server
-
-selenium = pytest.importorskip("selenium")
-
-from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.chrome.options import Options
-import os
-import sys
-import threading
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -39,7 +26,6 @@ def pytest_sessionstart(session):
     )
 
     with app.app_context():
-
         db.create_all()
 
 
