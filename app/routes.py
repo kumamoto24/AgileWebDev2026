@@ -5,6 +5,7 @@ import os
 
 
 from sqlalchemy import or_
+from app.conversations import get_or_create_conversation
 from app.models import Profile, Interest, User, Likes, Story, Conversation
 
 from math import radians, sin, cos, sqrt, atan2
@@ -686,8 +687,19 @@ def handle_like(profile_id):
                 liker_id=current_profile.id,
                 liked_id=liked_profile.id
             ))
-            db.session.commit()
-        return jsonify({"status": "success", "is_liked": True}), 200
+
+        conversation = get_or_create_conversation(
+            current_profile.id,
+            liked_profile.id,
+            commit=False
+        )
+        db.session.commit()
+
+        return jsonify({
+            "status": "success",
+            "is_liked": True,
+            "conversation_id": conversation.id
+        }), 200
 
     if action == "unlike":
         if existing_like:

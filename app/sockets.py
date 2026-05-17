@@ -1,54 +1,16 @@
-from flask import session
+from flask_login import current_user
 from flask_socketio import join_room, emit, disconnect
 
 from app import socketio, db
-from app.models import Profile, Conversation, Message, User
-
-
-def ordered_profile_ids(profile_a_id, profile_b_id):
-    profile_a_id = int(profile_a_id)
-    profile_b_id = int(profile_b_id)
-
-    if profile_a_id < profile_b_id:
-        return profile_a_id, profile_b_id
-
-    return profile_b_id, profile_a_id
-
-
-def get_or_create_conversation(profile_a_id, profile_b_id):
-    profile1_id, profile2_id = ordered_profile_ids(profile_a_id, profile_b_id)
-
-    conversation = Conversation.query.filter_by(
-        profile1_id=profile1_id,
-        profile2_id=profile2_id
-    ).first()
-
-    if conversation:
-        return conversation
-
-    conversation = Conversation(
-        profile1_id=profile1_id,
-        profile2_id=profile2_id
-    )
-
-    db.session.add(conversation)
-    db.session.commit()
-
-    return conversation
+from app.conversations import get_or_create_conversation
+from app.models import Profile, Message
 
 
 def get_current_profile():
-    user_id = session.get("user_id")
-
-    if not user_id:
+    if not current_user.is_authenticated:
         return None
 
-    user = db.session.get(User, user_id)
-
-    if not user:
-        return None
-
-    return user.profile
+    return current_user.profile
 
 
 def profile_room(profile_id):
