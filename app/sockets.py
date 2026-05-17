@@ -1,8 +1,8 @@
-from flask import session
+from flask_login import current_user
 from flask_socketio import join_room, emit, disconnect
 
 from app import socketio, db
-from app.models import Profile, Conversation, Message, User
+from app.models import Profile, Conversation, Message
 
 
 def ordered_profile_ids(profile_a_id, profile_b_id):
@@ -38,17 +38,10 @@ def get_or_create_conversation(profile_a_id, profile_b_id):
 
 
 def get_current_profile():
-    user_id = session.get("user_id")
-
-    if not user_id:
+    if not current_user.is_authenticated:
         return None
 
-    user = db.session.get(User, user_id)
-
-    if not user:
-        return None
-
-    return user.profile
+    return current_user.profile
 
 
 def profile_room(profile_id):
